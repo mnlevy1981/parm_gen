@@ -15,7 +15,13 @@ with open('parameters.yaml') as parmsfile:
 # NOTE: need to do something about parsing marbl_in
 # (could be here or in the "for var_name" loop)
 
+first_cat = True
 for cat_name in parameters.keys():
+    if first_cat:
+        first_cat = False
+    else:
+        print ""
+
     bars = "-" * len(cat_name)
     print "! %s" % bars
     print "! %s" % cat_name
@@ -30,5 +36,3 @@ for cat_name in parameters.keys():
         else:
             val = variable["default_value"]
         print "%s =" % var_name, val
-    print ""
-
