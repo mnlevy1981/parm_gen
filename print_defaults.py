@@ -16,8 +16,12 @@ with open('parameters.yaml') as parmsfile:
 # (could be here or in the "for var_name" loop)
 
 for cat_name in parameters.keys():
+    bars = "-" * len(cat_name)
+    print "! %s" % bars
     print "! %s" % cat_name
-    print "! ----"
+    print "! %s" % bars
+    print ""
+
     category = parameters[cat_name]
     for var_name in sorted(category.keys(), key=lambda s: s.lower()):
         variable = category[var_name]

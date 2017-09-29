@@ -32,7 +32,7 @@ with open(out_file, 'w') as fout:
         # 2. replace !## with auto-generated code
         if single_line.lstrip().startswith('!##'):
             # i. Make sure we keep the leading spaces
-            leading_spaces = ''.ljust(len(single_line) - len(single_line.lstrip()))
+            leading_spaces = " " * (len(single_line) - len(single_line.lstrip()))
 
             # ii. split single_line into an action and a category
             line_array = single_line.split()
