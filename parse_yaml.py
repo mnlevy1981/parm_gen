@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-import json
+import yaml
 
-with open('parameters.json') as parmsfile:
-  parameters = json.load(parmsfile)
+with open('parameters.yaml') as parmsfile:
+  parameters = yaml.load(parmsfile)
 
 for category in parameters.keys():
     print "%s" % category
