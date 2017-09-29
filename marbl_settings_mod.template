@@ -214,11 +214,7 @@ module marbl_settings_mod
   !    parameters with no dependencies on other parameter values
   !-------------------------------------------------------------
 
-  character(len=char_len), target :: PFT_defaults             ! Set up PFT parameters based on known classes, e.g. 'CESM2'
-                                                              ! (or set to 'user-specified' and use put_setting())
-  logical(log_kind), target :: ciso_on                        ! control whether ciso tracer module is active
-  logical(log_kind), target :: lsource_sink                   ! control which portion of code is executed, useful for debugging
-  logical(log_kind), target :: ciso_lsource_sink              ! control which portion of carbon isotope code is executed, useful for debugging
+  !## declare general_parms
   logical(log_kind), target :: lecovars_full_depth_tavg       ! should base ecosystem vars be written full depth
   logical(log_kind), target :: ciso_lecovars_full_depth_tavg  ! should carbon isotope vars be written full depth
   logical(log_kind), target :: lflux_gas_o2                   ! controls which portion of code are executed usefull for debugging
@@ -278,9 +274,7 @@ module marbl_settings_mod
   !    (can not be set until PFT_defaults is set)
   !-------------------------------------------------------------
 
-  integer(int_kind), target :: autotroph_cnt                  ! number of autotroph classes
-  integer(int_kind), target :: zooplankton_cnt                ! number of zooplankton classes
-  integer(int_kind), target :: max_grazer_prey_cnt            ! max number of biomass aggregates grazed by a zooplankton class
+  !## declare PFT_counts
 
   !  marbl_settings_define_PFT_derived_types
   !    Parameters associated with the PFT classes
@@ -341,10 +335,7 @@ contains
 
   subroutine marbl_settings_set_defaults_general_parms()
 
-    PFT_defaults                  = 'CESM2'      ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    ciso_on                       = .false.      ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    lsource_sink                  = .true.       ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    ciso_lsource_sink             = .true.       ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
+    !## default general_parms
     lecovars_full_depth_tavg      = .false.      ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
     ciso_lecovars_full_depth_tavg = .false.      ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
     lflux_gas_o2                  = .true.       ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above

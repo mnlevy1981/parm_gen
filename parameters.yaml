@@ -41,6 +41,12 @@ general_parms :
     units : unitless
     datatype : logical
     default_value : true
+  ciso_lsource_sink :
+    longname : Control which portions of the carbon isotope code are executed (useful for debugging)
+    category : config flags
+    units : unitless
+    datatype : logical
+    default_value : true
 
 # Category 2: PFT_counts
 PFT_counts :
