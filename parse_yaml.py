@@ -5,15 +5,15 @@ import yaml
 with open('parameters.yaml') as parmsfile:
   parameters = yaml.load(parmsfile)
 
-for category in parameters.keys():
-    print "%s" % category
+for cat_name in parameters.keys():
+    print "%s" % cat_name
     print "----"
-    cat = parameters[category]
-    for variable in cat.keys():
-        var = cat[variable]
-        if var["datatype"] == "string":
-            val = '"%s"' % var["default_value"]
+    category = parameters[cat_name]
+    for var_name in category.keys():
+        variable = category[var_name]
+        if variable["datatype"] == "string":
+            val = '"%s"' % variable["default_value"]
         else:
-            val = var["default_value"]
-        print "%s =" % variable, val
+            val = variable["default_value"]
+        print "%s =" % var_name, val
     print ""
