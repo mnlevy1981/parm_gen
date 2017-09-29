@@ -8,6 +8,12 @@ with open('parameters.yaml') as parmsfile:
 for category in parameters.keys():
     print "%s" % category
     print "----"
-    for variable in parameters[category].keys():
-        print "%s = " % variable, parameters[category][variable]["default_value"]
+    cat = parameters[category]
+    for variable in cat.keys():
+        var = cat[variable]
+        if var["datatype"] == "string":
+            val = '"%s"' % var["default_value"]
+        else:
+            val = var["default_value"]
+        print "%s =" % variable, val
     print ""
