@@ -1,4 +1,12 @@
 module marbl_settings_mod
+!!!
+!!! This file is a template for marbl_settings_mod.F90
+!!!
+!!! It will be parsed by [insert tool name here]
+!!! Lines beginning with !!! will be ignored, so this comment will
+!!! not appear in the generated code.
+!!! Lines beginning with !## will be replaced with generated Fortran
+!!!
 
   !-----------------------------------------------------------------------------
   !   This module manages BGC-specific parameters.
