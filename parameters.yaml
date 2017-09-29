@@ -47,6 +47,72 @@ general_parms :
     units : unitless
     datatype : logical
     default_value : true
+  lecovars_full_depth_tavg :
+    longname : Control whether base ecosystem variables are written full depth
+    category : config flags
+    units : unitless
+    datatype : logical
+    default_value : false
+  ciso_lecovars_full_depth_tavg :
+    longname : Control whether carbon isotope variables are written full depth
+    category : config flags
+    units : unitless
+    datatype : logical
+    default_value : false
+  lflux_gas_o2 :
+    longname : Control which portions of code are executed (useful for debugging)
+    category : config flags
+    units : unitless
+    datatype : logical
+    default_value : true
+  lflux_gas_co2 :
+    longname : Control which portions of code are executed (useful for debugging)
+    category : config flags
+    units : unitless
+    datatype : logical
+    default_value : true
+  lcompute_nhx_surface_emis :
+    longname : Control if NHx emissions are computed
+    category : config flags
+    units : unitless
+    datatype : logical
+    default_value : true
+  lvariable_PtoC :
+    longname : Control if PtoC ratios in autotrophs vary
+    category : config flags
+    units : unitless
+    datatype : logical
+    default_value : true
+  ladjust_bury_coeff :
+    longname : Control if bury coefficients are adjusted (rather than constant)
+    category : config flags
+    units : unitless
+    datatype : logical
+    default_value : false
+  init_bury_coeff_opt :
+    longname : Source of initial burial coefficient
+    category : config flags
+    units : unitless
+    datatype : string
+    default_value : nml
+  parm_Fe_bioavail :
+    longname : Fraction of Fe flux that is bioavailable
+    category : config flags
+    units : unitless
+    datatype : real
+    default_value : 1.0_r8
+  parm_o2_min :
+    longname : Minimum O2 needed for production & consumption
+    category : config flags
+    units : nmol/cm^3
+    datatype : real
+    default_value : 5.0_r8
+  parm_o2_min_delta :
+    longname : Width of min O2 range
+    category : config flags
+    units : nmol/cm^3
+    datatype : real
+    default_value : 5.0_r8
 
 # Category 2: PFT_counts
 PFT_counts :

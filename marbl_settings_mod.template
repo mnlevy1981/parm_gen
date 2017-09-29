@@ -215,25 +215,13 @@ module marbl_settings_mod
   !-------------------------------------------------------------
 
   !## declare general_parms
-  logical(log_kind), target :: lecovars_full_depth_tavg       ! should base ecosystem vars be written full depth
-  logical(log_kind), target :: ciso_lecovars_full_depth_tavg  ! should carbon isotope vars be written full depth
-  logical(log_kind), target :: lflux_gas_o2                   ! controls which portion of code are executed usefull for debugging
-  logical(log_kind), target :: lflux_gas_co2                  ! controls which portion of code are executed usefull for debugging
-  logical(log_kind), target :: lcompute_nhx_surface_emis      ! control if NHx emissions are computed
-  logical(log_kind), target :: lvariable_PtoC                 ! control if PtoC ratios in autotrophs vary
-  logical(log_kind), target :: ladjust_bury_coeff             ! control if bury coefficients are adjusted (rather than constant)
-                                                              !   bury coefficients (POC_bury_coeff, POP_bury_coeff, bSi_bury_coeff)
-                                                              !   reside in marbl_particulate_share_type; when ladjust_bury_coeff is
-                                                              !   .true., bury coefficients are adjusted to preserve C, P, Si
-                                                              !   inventories on timescales exceeding bury_coeff_rmean_timescale_years
-                                                              !   (this is done primarily in spinup runs)
-
-  character(len=char_len), target :: init_bury_coeff_opt
+  !!! Prev Comment: !   bury coefficients (POC_bury_coeff, POP_bury_coeff, bSi_bury_coeff)
+  !!! Prev Comment: !   reside in marbl_particulate_share_type; when ladjust_bury_coeff is
+  !!! Prev Comment: !   .true., bury coefficients are adjusted to preserve C, P, Si
+  !!! Prev Comment: !   inventories on timescales exceeding bury_coeff_rmean_timescale_years
+  !!! Prev Comment: !   (this is done primarily in spinup runs)
 
   real(r8), target :: &
-       parm_Fe_bioavail,           & ! fraction of Fe flux that is bioavailable
-       parm_o2_min,                & ! min O2 needed for prod & consump. (nmol/cm^3)
-       parm_o2_min_delta,          & ! width of min O2 range (nmol/cm^3)
        parm_kappa_nitrif_per_day,  & ! nitrification inverse time constant (1/day)
        parm_kappa_nitrif,          & ! nitrification inverse time constant (1/sec) (derived from parm_kappa_nitrif_per_day)
        parm_nitrif_par_lim,        & ! PAR limit for nitrif. (W/m^2)
@@ -336,17 +324,6 @@ contains
   subroutine marbl_settings_set_defaults_general_parms()
 
     !## default general_parms
-    lecovars_full_depth_tavg      = .false.      ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    ciso_lecovars_full_depth_tavg = .false.      ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    lflux_gas_o2                  = .true.       ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    lflux_gas_co2                 = .true.       ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    lcompute_nhx_surface_emis     = .true.       ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    lvariable_PtoC                = .true.       ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    init_bury_coeff_opt           = 'nml'        ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    ladjust_bury_coeff            = .false.      ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    parm_Fe_bioavail           = 1.0_r8          ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    parm_o2_min                = 5.0_r8          ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    parm_o2_min_delta          = 5.0_r8          ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
     parm_kappa_nitrif_per_day  = 0.06_r8         ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
     parm_nitrif_par_lim        = 1.0_r8          ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
     parm_labile_ratio          = 0.94_r8         ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above

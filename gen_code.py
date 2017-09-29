@@ -43,13 +43,20 @@ with open(out_file, 'w') as fout:
             # iii. act based on action
             if action == "declare":
                 for var_name in parameters[cat_name]:
-                    fout.write("%s%s, target :: %s   ! %s\n" % (leading_spaces,
-                                                                types[parameters[cat_name][var_name]["datatype"]],
-                                                                var_name,
-                                                                parameters[cat_name][var_name]["longname"]))
+                    comment = "! %s" % parameters[cat_name][var_name]["longname"]
+                    if parameters[cat_name][var_name]["datatype"] in ("real", "integer"):
+                        comment = comment + " [units: %s]" % parameters[cat_name][var_name]["units"]
+                    fout.write("%s%s, target :: %s   %s\n" % (leading_spaces,
+                                                              types[parameters[cat_name][var_name]["datatype"]],
+                                                              var_name,
+                                                              comment))
             if action == "default":
                 for var_name in parameters[cat_name]:
                     if parameters[cat_name][var_name]["datatype"] == "string":
+                        fout.write("%s%s = '%s'\n" % (leading_spaces,
+                                                    var_name,
+                                                    parameters[cat_name][var_name]["default_value"]))
+                    if parameters[cat_name][var_name]["datatype"] == "real":
                         fout.write("%s%s = '%s'\n" % (leading_spaces,
                                                     var_name,
                                                     parameters[cat_name][var_name]["default_value"]))
