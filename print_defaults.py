@@ -73,7 +73,7 @@ for cat_name in parameters.keys():
             value = match_key(key, variable["default_value"])
         else:
             if variable["datatype"] == "string":
-                value = '"%s"' % value
+                value = '"%s"' % variable["default_value"]
             else:
                 value = variable["default_value"]
         print "%s =" % var_name, value

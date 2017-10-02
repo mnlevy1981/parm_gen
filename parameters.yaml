@@ -108,45 +108,51 @@ general_parms :
     category : general parmeters
     units : unitless
     datatype : real
-    default_value : 1.0_r8
+    default_value : 1.0
   parm_o2_min :
     longname : Minimum O2 needed for production & consumption
     category : general parmeters
     units : nmol/cm^3
     datatype : real
-    default_value : 5.0_r8
+    default_value : 5.0
   parm_o2_min_delta :
     longname : Width of min O2 range
     category : general parmeters
     units : nmol/cm^3
     datatype : real
-    default_value : 5.0_r8
+    default_value : 5.0
   parm_kappa_nitrif_per_day :
     longname : Nitrification inverse time constant
     category : general parmeters
     units : 1/day
     datatype : real
-    default_value : 0.06_r8
+    default_value : 0.06
   parm_nitrif_par_lim :
     longname : PAR limit for nitrification
     category : general parameters
     units : W/m^2
     datatype : real
-    default_value : 1.0_r8
+    default_value : 1.0
   parm_labile_ratio :
     longname : Fraction of loss to DOC that routed directly to DIC
     category : general parmeters
     units : unitless
     datatype : real
-    default_value : 0.94_r8
+    default_value : 0.94
   parm_init_POC_bury_coeff :
     longname : Initial scale factor for burial of POC, PON
     category : general parameter
     units : unitless
     datatype : real
     default_value : # default value is resolution dependent!
-      default : 1.1_r8
-      CESM_x3 : 5.0_r8
+      default : 1.1
+      CESM_x3 : 5.0
+  parm_scalelen_z :
+    longname : prescribed scalelen values
+    category : Scale lengths
+    units : cm
+    datatype : real(4)
+    default_value : 100.0e2, 250.0e2, 500.0e2, 1000.0e2
 
 # Category 2: PFT_counts
 PFT_counts :
