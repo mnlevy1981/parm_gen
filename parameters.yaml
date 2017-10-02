@@ -91,28 +91,52 @@ general_parms :
     default_value : false
   init_bury_coeff_opt :
     longname : Source of initial burial coefficient
-    category : config flags
+    category : config strings
     units : unitless
     datatype : string
     default_value : nml
   parm_Fe_bioavail :
     longname : Fraction of Fe flux that is bioavailable
-    category : config flags
+    category : general parmeters
     units : unitless
     datatype : real
     default_value : 1.0_r8
   parm_o2_min :
     longname : Minimum O2 needed for production & consumption
-    category : config flags
+    category : general parmeters
     units : nmol/cm^3
     datatype : real
     default_value : 5.0_r8
   parm_o2_min_delta :
     longname : Width of min O2 range
-    category : config flags
+    category : general parmeters
     units : nmol/cm^3
     datatype : real
     default_value : 5.0_r8
+  parm_kappa_nitrif_per_day :
+    longname : Nitrification inverse time constant
+    category : general parmeters
+    units : 1/day
+    datatype : real
+    default_value : 0.06_r8
+  parm_nitrif_par_lim :
+    longname : PAR limit for nitrification
+    category : general parameters
+    units : W/m^2
+    datatype : real
+    default_value : 1.0_r8
+  parm_labile_ratio :
+    longname : Fraction of loss to DOC that routed directly to DIC
+    category : general parmeters
+    units : unitless
+    datatype : real
+    default_value : 0.94_r8
+  parm_init_POC_bury_coeff :
+    longname : Initial scale factor for burial of POC, PON
+    category : general parameter
+    units : unitless
+    datatype : real
+    default_value : {'default' : 1.1_r8, 'x3' : 5.0_r8}
 
 # Category 2: PFT_counts
 PFT_counts :

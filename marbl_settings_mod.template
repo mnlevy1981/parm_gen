@@ -222,11 +222,7 @@ module marbl_settings_mod
   !!! Prev Comment: !   (this is done primarily in spinup runs)
 
   real(r8), target :: &
-       parm_kappa_nitrif_per_day,  & ! nitrification inverse time constant (1/day)
        parm_kappa_nitrif,          & ! nitrification inverse time constant (1/sec) (derived from parm_kappa_nitrif_per_day)
-       parm_nitrif_par_lim,        & ! PAR limit for nitrif. (W/m^2)
-       parm_labile_ratio,          & ! fraction of loss to DOC that routed directly to DIC (non-dimensional)
-       parm_init_POC_bury_coeff,   & ! initial scale factor for burial of POC, PON
        parm_init_POP_bury_coeff,   & ! initial scale factor for burial of POP
        parm_init_bSi_bury_coeff,   & ! initial scale factor burial of bSi
        parm_Fe_scavenge_rate0,     & ! scavenging base rate for Fe
@@ -324,10 +320,6 @@ contains
   subroutine marbl_settings_set_defaults_general_parms()
 
     !## default general_parms
-    parm_kappa_nitrif_per_day  = 0.06_r8         ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    parm_nitrif_par_lim        = 1.0_r8          ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    parm_labile_ratio          = 0.94_r8         ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    parm_init_POC_bury_coeff   = 1.1_r8          ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
     parm_init_POP_bury_coeff   = 1.1_r8          ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
     parm_init_bSi_bury_coeff   = 1.0_r8          ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
     parm_Fe_scavenge_rate0     = 15.0_r8         ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above

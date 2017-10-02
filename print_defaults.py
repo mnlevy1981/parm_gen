@@ -1,9 +1,47 @@
 #!/usr/bin/env python
 
+################################
+# Parse command line arguments #
+################################
+
+import argparse
+
+parser = argparse.ArgumentParser(description="Print default MARBL parameter values from YAML file")
+
+parser.add_argument('--res', action='store', dest='resolution',
+                    help='Some default values are resolution dependent')
+
+# TODO: Other potential arguments
+#       1. Full path for YAML file? (default: ./parameters.yaml)
+
+args = parser.parse_args()
+key = args.resolution
+
+##################################
+# Read YAML file into dictionary #
+##################################
+
 import yaml
 
 with open('parameters.yaml') as parmsfile:
   parameters = yaml.safe_load(parmsfile)
+
+##################################################################
+# Return correct default value if multiple defaults are provided #
+##################################################################
+
+def match_key(key, dictionary):
+    # TODO:
+    #       1. Move to a separate library (maybe define a class?)
+    #          So this can be used by gen_code.py as well
+    #       2. Handle multiple provided keys (recursive, nested?)
+    if key not in dictionary.keys():
+        key = 'default'
+    return dictionary[key]
+
+################
+# BEGIN SCRIPT #
+################
 
 # Validation
 # ---------
@@ -31,8 +69,11 @@ for cat_name in parameters.keys():
     category = parameters[cat_name]
     for var_name in sorted(category.keys(), key=lambda s: s.lower()):
         variable = category[var_name]
-        if variable["datatype"] == "string":
-            val = '"%s"' % variable["default_value"]
+        if isinstance(variable["default_value"], dict):
+            value = match_key(key, variable["default_value"])
         else:
-            val = variable["default_value"]
-        print "%s =" % var_name, val
+            if variable["datatype"] == "string":
+                value = '"%s"' % value
+            else:
+                value = variable["default_value"]
+        print "%s =" % var_name, value
