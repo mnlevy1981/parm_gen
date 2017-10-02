@@ -14,6 +14,14 @@
 # 3. units: physical units (use "unitless" for pure numbers and "non-numeric" for strings / logicals)
 # 4. datatype: integer, real, logical, or string
 # 5. default_value: Value to use unless overwritten by the MARBL input file
+#       NOTE: some parameters provide different default values for different configurations;
+#             e.g. in CESM, the value of some parameters is resolution-dependent. In these
+#             cases, default_value should be a dictionary with a "default" key and then keys
+#             for whatever resolutions differ from the default.
+#
+#             Accepted keys:
+#                1. default
+#                2. CESM_x3
 #
 # There are also some optional metadata options:
 # 1. valid_values: only values that MARBL will accept (default_value must be in valid_values!)
@@ -136,7 +144,9 @@ general_parms :
     category : general parameter
     units : unitless
     datatype : real
-    default_value : {'default' : 1.1_r8, 'x3' : 5.0_r8}
+    default_value : # default value is resolution dependent!
+      default : 1.1_r8
+      CESM_x3 : 5.0_r8
 
 # Category 2: PFT_counts
 PFT_counts :
