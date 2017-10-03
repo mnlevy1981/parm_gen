@@ -45,6 +45,6 @@ for cat_name in DefaultParms.get_category_names():
     print "! %s" % bars
     print ""
 
-    for var_name in sorted(DefaultParms.get_variable_names(cat_name), key=lambda s: s.lower()):
+    for var_name in DefaultParms.get_variable_names(cat_name):
         value = DefaultParms.get_variable_value(cat_name, var_name)
         print "%s =" % var_name, value

@@ -25,152 +25,176 @@
 #
 # There are also some optional metadata options:
 # 1. valid_values: only values that MARBL will accept (default_value must be in valid_values!)
+# 2. cannot change:
+# 3. must set:
+# 4. append_to_config_keywords:
 #
 # TODO: parameters that are arrays?
 
+_order : ["general_parms", "PFT_counts"]
+
 # Category 1: General Parameters
 general_parms :
-  PFT_defaults :
-    longname : Define how PFTs are initialized
-    category : config PFTs
-    units : unitless
-    datatype : string
-    default_value : CESM2
-    valid_values : CESM2, user-specified
-  ciso_on :
-    longname : Control whether CISO tracer module is active
-    category : config flags
-    units : unitless
-    datatype : logical
-    default_value : false
-  lsource_sink :
-    longname : Control which portions of code are executed (useful for debugging)
-    category : config flags
-    units : unitless
-    datatype : logical
-    default_value : true
-  ciso_lsource_sink :
-    longname : Control which portions of the carbon isotope code are executed (useful for debugging)
-    category : config flags
-    units : unitless
-    datatype : logical
-    default_value : true
-  lecovars_full_depth_tavg :
-    longname : Control whether base ecosystem variables are written full depth
-    category : config flags
-    units : unitless
-    datatype : logical
-    default_value : false
-  ciso_lecovars_full_depth_tavg :
-    longname : Control whether carbon isotope variables are written full depth
-    category : config flags
-    units : unitless
-    datatype : logical
-    default_value : false
-  lflux_gas_o2 :
-    longname : Control which portions of code are executed (useful for debugging)
-    category : config flags
-    units : unitless
-    datatype : logical
-    default_value : true
-  lflux_gas_co2 :
-    longname : Control which portions of code are executed (useful for debugging)
-    category : config flags
-    units : unitless
-    datatype : logical
-    default_value : true
-  lcompute_nhx_surface_emis :
-    longname : Control if NHx emissions are computed
-    category : config flags
-    units : unitless
-    datatype : logical
-    default_value : true
-  lvariable_PtoC :
-    longname : Control if PtoC ratios in autotrophs vary
-    category : config flags
-    units : unitless
-    datatype : logical
-    default_value : true
-  ladjust_bury_coeff :
-    longname : Control if bury coefficients are adjusted (rather than constant)
-    category : config flags
-    units : unitless
-    datatype : logical
-    default_value : false
-  init_bury_coeff_opt :
-    longname : Source of initial burial coefficient
-    category : config strings
-    units : unitless
-    datatype : string
-    default_value : nml
-  parm_Fe_bioavail :
-    longname : Fraction of Fe flux that is bioavailable
-    category : general parmeters
-    units : unitless
-    datatype : real
-    default_value : 1.0
-  parm_o2_min :
-    longname : Minimum O2 needed for production & consumption
-    category : general parmeters
-    units : nmol/cm^3
-    datatype : real
-    default_value : 5.0
-  parm_o2_min_delta :
-    longname : Width of min O2 range
-    category : general parmeters
-    units : nmol/cm^3
-    datatype : real
-    default_value : 5.0
-  parm_kappa_nitrif_per_day :
-    longname : Nitrification inverse time constant
-    category : general parmeters
-    units : 1/day
-    datatype : real
-    default_value : 0.06
-  parm_nitrif_par_lim :
-    longname : PAR limit for nitrification
-    category : general parameters
-    units : W/m^2
-    datatype : real
-    default_value : 1.0
-  parm_labile_ratio :
-    longname : Fraction of loss to DOC that routed directly to DIC
-    category : general parmeters
-    units : unitless
-    datatype : real
-    default_value : 0.94
-  parm_init_POC_bury_coeff :
-    longname : Initial scale factor for burial of POC, PON
-    category : general parameter
-    units : unitless
-    datatype : real
-    default_value : # default value is resolution dependent!
-      default : 1.1
-      CESM_x3 : 5.0
-  parm_scalelen_z :
-    longname : prescribed scalelen values
-    category : Scale lengths
-    units : cm
-    datatype : real(4)
-    default_value : 100.0e2, 250.0e2, 500.0e2, 1000.0e2
+   PFT_defaults :
+      longname : Define how PFTs are initialized
+      category : config PFTs
+      units : unitless
+      datatype : string
+      default_value : CESM2
+      valid_values : CESM2, user-specified
+      append_to_config_keywords : true
+   ciso_on :
+      longname : Control whether CISO tracer module is active
+      category : config flags
+      units : unitless
+      datatype : logical
+      default_value : false
+   lsource_sink :
+      longname : Control which portions of code are executed (useful for debugging)
+      category : config flags
+      units : unitless
+      datatype : logical
+      default_value : true
+   ciso_lsource_sink :
+      longname : Control which portions of the carbon isotope code are executed (useful for debugging)
+      category : config flags
+      units : unitless
+      datatype : logical
+      default_value : true
+   lecovars_full_depth_tavg :
+      longname : Control whether base ecosystem variables are written full depth
+      category : config flags
+      units : unitless
+      datatype : logical
+      default_value : false
+   ciso_lecovars_full_depth_tavg :
+      longname : Control whether carbon isotope variables are written full depth
+      category : config flags
+      units : unitless
+      datatype : logical
+      default_value : false
+   lflux_gas_o2 :
+      longname : Control which portions of code are executed (useful for debugging)
+      category : config flags
+      units : unitless
+      datatype : logical
+      default_value : true
+   lflux_gas_co2 :
+      longname : Control which portions of code are executed (useful for debugging)
+      category : config flags
+      units : unitless
+      datatype : logical
+      default_value : true
+   lcompute_nhx_surface_emis :
+      longname : Control if NHx emissions are computed
+      category : config flags
+      units : unitless
+      datatype : logical
+      default_value : true
+   lvariable_PtoC :
+      longname : Control if PtoC ratios in autotrophs vary
+      category : config flags
+      units : unitless
+      datatype : logical
+      default_value : true
+   ladjust_bury_coeff :
+      longname : Control if bury coefficients are adjusted (rather than constant)
+      category : config flags
+      units : unitless
+      datatype : logical
+      default_value : false
+   init_bury_coeff_opt :
+      longname : Source of initial burial coefficient
+      category : config strings
+      units : unitless
+      datatype : string
+      default_value : nml
+   parm_Fe_bioavail :
+      longname : Fraction of Fe flux that is bioavailable
+      category : general parmeters
+      units : unitless
+      datatype : real
+      default_value : 1.0
+   parm_o2_min :
+      longname : Minimum O2 needed for production & consumption
+      category : general parmeters
+      units : nmol/cm^3
+      datatype : real
+      default_value : 5.0
+   parm_o2_min_delta :
+      longname : Width of min O2 range
+      category : general parmeters
+      units : nmol/cm^3
+      datatype : real
+      default_value : 5.0
+   parm_kappa_nitrif_per_day :
+      longname : Nitrification inverse time constant
+      category : general parmeters
+      units : 1/day
+      datatype : real
+      default_value : 0.06
+   parm_nitrif_par_lim :
+      longname : PAR limit for nitrification
+      category : general parameters
+      units : W/m^2
+      datatype : real
+      default_value : 1.0
+   parm_labile_ratio :
+      longname : Fraction of loss to DOC that routed directly to DIC
+      category : general parmeters
+      units : unitless
+      datatype : real
+      default_value : 0.94
+   parm_init_POC_bury_coeff :
+      longname : Initial scale factor for burial of POC, PON
+      category : general parameter
+      units : unitless
+      datatype : real
+      default_value : # default value is resolution dependent!
+         default : 1.1
+         grid = CESM_x3 : 5.0
+   parm_scalelen_z :
+      longname : prescribed scalelen values
+      category : Scale lengths
+      units : cm
+      datatype : real(4)
+      default_value : 100.0e2, 250.0e2, 500.0e2, 1000.0e2
 
 # Category 2: PFT_counts
 PFT_counts :
-  autotroph_cnt :
-    longname : Number of autotroph classes
-    category : config PFTs
-    units : unitless
-    datatype : integer
-    default_value : 3
-  zooplankton_cnt :
-    longname : Number of zooplankton classes
-    category : config PFTs
-    units : unitless
-    datatype : integer
-    default_value : 1
-  max_grazer_prey_cnt :
-    longname : Number of grazer prey classes
-    category : config PFTs
-    units : unitless
-    datatype : integer
-    default_value : 3
+   autotroph_cnt :
+      longname : Number of autotroph classes
+      category : config PFTs
+      units : unitless
+      datatype : integer
+      default_value : 3
+      cannot change : PFT_defaults == 'CESM2'
+      must set : PFT_defaults == 'user-specified'
+   zooplankton_cnt :
+      longname : Number of zooplankton classes
+      category : config PFTs
+      units : unitless
+      datatype : integer
+      default_value : 1
+   max_grazer_prey_cnt :
+      longname : Number of grazer prey classes
+      category : config PFTs
+      units : unitless
+      datatype : integer
+      default_value : 3
+
+# Category 3: PFTs
+PFTs :
+   autotrophs(1) :
+      short_name :
+         longname : The short name of the autotroph class in autotrophs(1)
+         category : PFTs
+         units : unitless
+         datatype : integer
+         default_value :
+            default : 'UNSET'
+            PFT_defaults = CESM : 'sp'
+      long_name :
+         default_value :
+            default : 'UNSET'
+            PFT_defaults = CESM : 'sp'
