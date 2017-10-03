@@ -1,3 +1,6 @@
+# TODO:
+#       i.  finalize class name and file name
+#       ii. comment at top of this file explaining what class should be used for
 class yaml_parsing_class(object):
     def __init__(self, yaml_file, key=None):
         import yaml

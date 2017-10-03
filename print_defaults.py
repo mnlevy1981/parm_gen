@@ -17,6 +17,8 @@ parser.add_argument('--res', action='store', dest='resolution', default='CESM_x1
                     help='Some default values are resolution dependent')
 
 # TODO: Add command line argument for input file
+# TODO: maybe add command line argument for path to yaml_parsing_class.py?
+#       Then update path before importing the class
 args = parser.parse_args()
 
 ###################################
