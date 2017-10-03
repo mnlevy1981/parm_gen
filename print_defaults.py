@@ -13,8 +13,8 @@ parser.add_argument('--yaml_file', action='store', dest='yaml_file', default='pa
                     help='Location of YAML-formatted MARBL configuration file')
 
 # Command line argument to specify resolution (default is CESM_x1)
-parser.add_argument('--res', action='store', dest='resolution', default='CESM_x1',
-                    help='Some default values are resolution dependent')
+parser.add_argument('--grid', action='store', dest='grid', default='CESM_x1',
+                    help='Some default values are grid-dependent')
 
 # TODO: Add command line argument for input file
 # TODO: maybe add command line argument for path to yaml_parsing_class.py?
@@ -26,7 +26,7 @@ args = parser.parse_args()
 ###################################
 
 from yaml_parsing_class import yaml_parsing_class
-DefaultParms = yaml_parsing_class(args.yaml_file, args.resolution)
+DefaultParms = yaml_parsing_class(args.yaml_file, args.grid)
 
 ################
 # BEGIN SCRIPT #

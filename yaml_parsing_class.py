@@ -2,12 +2,19 @@
 #       i.  finalize class name and file name
 #       ii. comment at top of this file explaining what class should be used for
 class yaml_parsing_class(object):
-    def __init__(self, yaml_file, key=None):
+    def __init__(self, yaml_file, grid):
+        """
+        Class constructor: set up a dictionary of config keywords for when multiple
+        default values are provided, and then read the YAML file.
+        """
+        # 1. Set up dictionary of config keywords
+        self._config_keyword = dict()
+        self._config_keyword['grid'] = grid
+
+        # 2. Read YAML file
         import yaml
         with open(yaml_file) as parmsfile:
             self._parms = yaml.safe_load(parmsfile)
-        # TODO: would like self._key to be a dictionary ({'res' : ..., 'var_PtoC' : ..., others?})
-        self._key   = "grid = "+key
 
 ##################
 # PUBLIC METHODS #
@@ -41,10 +48,10 @@ class yaml_parsing_class(object):
     def get_variable_value(self, category_name, variable_name):
         this_var = self._parms[category_name][variable_name]
 
-        # is default value a dictionary? If so, it depends on self._key
+        # is default value a dictionary? If so, it depends on self._config_keyword
         # Otherwise we're interested in default value
         if isinstance(this_var["default_value"], dict):
-            def_value = self._match_key(category_name, variable_name)
+            def_value = self._get_correct_default(category_name, variable_name)
         else:
             def_value = this_var["default_value"]
 
@@ -65,12 +72,18 @@ class yaml_parsing_class(object):
 #       i.  datatype match?
 #       ii. optional valid_value key check
 
-    def _match_key(self, category_name, variable_name):
+    def _get_correct_default(self, category_name, variable_name):
         """
-        This is called when the default_value is a dictionary
+        This is called when the default_value is a dictionary; it compares
+        self._config_keyword to the keys in default_value and returns the
+        most appropriate default
         """
-        key = self._key
+        provided_keys = []
+        provided_keys.append("grid = " + self._config_keyword['grid'])
+        use_key = "default"
         # TODO: Check to make sure default is a key
-        if key not in self._parms[category_name][variable_name]["default_value"].keys():
-            key = "default"
-        return self._parms[category_name][variable_name]["default_value"][key]
+
+        for key in provided_keys:
+            if key in self._parms[category_name][variable_name]["default_value"].keys():
+                use_key = key
+        return self._parms[category_name][variable_name]["default_value"][use_key]
