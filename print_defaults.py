@@ -17,27 +17,12 @@ parser.add_argument('--res', action='store', dest='resolution',
 args = parser.parse_args()
 key = args.resolution
 
-##################################
-# Read YAML file into dictionary #
-##################################
+###################################
+# Initialize class from YAML file #
+###################################
 
-import yaml
-
-with open('parameters.yaml') as parmsfile:
-  parameters = yaml.safe_load(parmsfile)
-
-##################################################################
-# Return correct default value if multiple defaults are provided #
-##################################################################
-
-def match_key(key, dictionary):
-    # TODO:
-    #       1. Move to a separate library (maybe define a class?)
-    #          So this can be used by gen_code.py as well
-    #       2. Handle multiple provided keys (recursive, nested?)
-    if key not in dictionary.keys():
-        key = 'default'
-    return dictionary[key]
+from yaml_parsing_class import yaml_parsing_class
+DefaultParms = yaml_parsing_class('parameters.yaml', args.resolution)
 
 ################
 # BEGIN SCRIPT #
@@ -54,7 +39,7 @@ def match_key(key, dictionary):
 # (could be here or in the "for var_name" loop)
 
 first_cat = True
-for cat_name in parameters.keys():
+for cat_name in DefaultParms.get_category_names():
     if first_cat:
         first_cat = False
     else:
@@ -66,14 +51,6 @@ for cat_name in parameters.keys():
     print "! %s" % bars
     print ""
 
-    category = parameters[cat_name]
-    for var_name in sorted(category.keys(), key=lambda s: s.lower()):
-        variable = category[var_name]
-        if isinstance(variable["default_value"], dict):
-            value = match_key(key, variable["default_value"])
-        else:
-            if variable["datatype"] == "string":
-                value = '"%s"' % variable["default_value"]
-            else:
-                value = variable["default_value"]
+    for var_name in sorted(DefaultParms.get_variable_names(cat_name), key=lambda s: s.lower()):
+        value = DefaultParms.get_variable_value(cat_name, var_name)
         print "%s =" % var_name, value
