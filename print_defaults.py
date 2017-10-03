@@ -8,35 +8,27 @@ import argparse
 
 parser = argparse.ArgumentParser(description="Print default MARBL parameter values from YAML file")
 
-parser.add_argument('--res', action='store', dest='resolution',
+# Command line argument to point to YAML file (default is parameters.yaml)
+parser.add_argument('--yaml_file', action='store', dest='yaml_file', default='parameters.yaml',
+                    help='Location of YAML-formatted MARBL configuration file')
+
+# Command line argument to specify resolution (default is CESM_x1)
+parser.add_argument('--res', action='store', dest='resolution', default='CESM_x1',
                     help='Some default values are resolution dependent')
 
-# TODO: Other potential arguments
-#       1. Full path for YAML file? (default: ./parameters.yaml)
-
+# TODO: Add command line argument for input file
 args = parser.parse_args()
-key = args.resolution
 
 ###################################
 # Initialize class from YAML file #
 ###################################
 
 from yaml_parsing_class import yaml_parsing_class
-DefaultParms = yaml_parsing_class('parameters.yaml', args.resolution)
+DefaultParms = yaml_parsing_class(args.yaml_file, args.resolution)
 
 ################
 # BEGIN SCRIPT #
 ################
-
-# Validation
-# ---------
-# 1. Is variable from input file defined in dictionary?
-# 2. Is the value provided valid?
-#    i. datatype match?
-#    ii. YAML could have is_valid() function!
-#
-# NOTE: need to do something about parsing marbl_in
-# (could be here or in the "for var_name" loop)
 
 first_cat = True
 for cat_name in DefaultParms.get_category_names():
