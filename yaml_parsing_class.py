@@ -7,9 +7,13 @@ class yaml_parsing_class(object):
         Class constructor: set up a dictionary of config keywords for when multiple
         default values are provided, and then read the YAML file.
         """
-        # 1. Set up dictionary of config keywords
+        # 1. Set up dictionary of config keywords as well as a list
         self._config_keyword = dict()
         self._config_keyword['grid'] = grid
+
+        #2. Or maybe we want a list?
+        self._provided_keys = []
+        self._provided_keys.append("grid = " + self._config_keyword['grid'])
 
         # 2. Read YAML file
         import yaml
@@ -78,12 +82,10 @@ class yaml_parsing_class(object):
         self._config_keyword to the keys in default_value and returns the
         most appropriate default
         """
-        provided_keys = []
-        provided_keys.append("grid = " + self._config_keyword['grid'])
         use_key = "default"
         # TODO: Check to make sure default is a key
 
-        for key in provided_keys:
+        for key in self._provided_keys:
             if key in self._parms[category_name][variable_name]["default_value"].keys():
                 use_key = key
         return self._parms[category_name][variable_name]["default_value"][use_key]
