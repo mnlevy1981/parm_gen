@@ -8,7 +8,7 @@ class MARBL_defaults_class(object):
 # CONSTRUCTOR #
 ###############
 
-    def __init__(self, yaml_file, grid):
+    def __init__(self, yaml_file, grid, input_file):
         """
         Class constructor: set up a dictionary of config keywords for when multiple
         default values are provided, and then read the YAML file.
@@ -21,11 +21,15 @@ class MARBL_defaults_class(object):
         self._provided_keys = []
         self._provided_keys.append("grid = " + self._config_keyword['grid'])
 
-        # 2. Read YAML file
+        # 3. Read YAML file
         import yaml
         with open(yaml_file) as parmsfile:
             self._parms = yaml.safe_load(parmsfile)
 
+        # 4. Read input file
+        #    (Currently not implemented)
+        if input_file is not None:
+            self._abort("ERROR: input_file is not a supported option at this time")
 ##################
 # PUBLIC METHODS #
 ##################
