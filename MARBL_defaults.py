@@ -58,6 +58,14 @@ class MARBL_defaults_class(object):
                 msg = "ERROR: '" + key + "' is not listed in '_order' and won't be processed"
                 self._abort(msg)
 
+        # 3. No duplicates in _order
+        unique_keys = []
+        for key in self._parms["_order"]:
+            if key in unique_keys:
+                msg = "ERROR: '" + key + "' appears in '_order' multiple times"
+                self._abort(msg)
+            unique_keys.append(key)
+
         return self._parms["_order"]
 
     def get_variable_names(self, category_name):
