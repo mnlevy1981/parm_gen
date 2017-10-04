@@ -25,8 +25,8 @@ args = parser.parse_args()
 # Initialize class from YAML file #
 ###################################
 
-from yaml_parsing_class import yaml_parsing_class
-DefaultParms = yaml_parsing_class(args.yaml_file, args.grid)
+from MARBL_defaults import MARBL_defaults_class
+DefaultParms = MARBL_defaults_class(args.yaml_file, args.grid)
 
 ################
 # BEGIN SCRIPT #

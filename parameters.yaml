@@ -184,17 +184,17 @@ PFT_counts :
       default_value : 3
 
 # Category 3: PFTs
-PFTs :
-   autotrophs(1) :
-      short_name :
-         longname : The short name of the autotroph class in autotrophs(1)
-         category : PFTs
-         units : unitless
-         datatype : integer
-         default_value :
-            default : 'UNSET'
-            PFT_defaults = CESM : 'sp'
-      long_name :
-         default_value :
-            default : 'UNSET'
-            PFT_defaults = CESM : 'sp'
+# PFTs :
+#    autotrophs(1) :
+#       short_name :
+#          longname : The short name of the autotroph class in autotrophs(1)
+#          category : PFTs
+#          units : unitless
+#          datatype : integer
+#          default_value :
+#             default : 'UNSET'
+#             PFT_defaults = CESM : 'sp'
+#       long_name :
+#          default_value :
+#             default : 'UNSET'
+#             PFT_defaults = CESM : 'sp'

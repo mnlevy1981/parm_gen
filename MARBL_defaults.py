@@ -1,7 +1,13 @@
-# TODO:
-#       i.  finalize class name and file name
-#       ii. comment at top of this file explaining what class should be used for
-class yaml_parsing_class(object):
+class MARBL_defaults_class(object):
+    """
+    This class contains methods to allow python to interact with the YAML file that
+    defines the MARBL parameters and sets default values
+    """
+
+###############
+# CONSTRUCTOR #
+###############
+
     def __init__(self, yaml_file, grid):
         """
         Class constructor: set up a dictionary of config keywords for when multiple
@@ -32,14 +38,26 @@ class yaml_parsing_class(object):
 #          iii. Thought: two dictionarys, self._parms (renamed self._yaml_parms) and self._input_parms
 #                        Look in _input_parms first, if no key match then fallback to YAML?
 #                        Or maybe combine YAML and inputfile during __init__?
+
     def get_category_names(self):
         """
-        Returns category names as determined by the 'order :' key in YAML
+        Returns category names as determined by the '_order' key in YAML
         """
-        # TODO: consistency check!
-        #       1. size of get_order should = size of dictionary
-        #       2. every key should appear exactly once
-        #       3. Something PFT specific if we nest PFT in another dictionary?
+
+        # Consistency checks:
+        # 1. All keys listed in self._parms["_order"] should also be in self._parms.keys()
+        for key in self._parms["_order"]:
+            if key not in self._parms.keys():
+                msg = "ERROR: can not find '" + key + "' in YAML file"
+                self._abort(msg)
+
+        # 2. All keys listed in self._parms.keys() should also be in self._parms["_order"]
+        #    (except _order itself)
+        for key in self._parms.keys():
+            if key not in ["_order"] and key not in self._parms["_order"]:
+                msg = "ERROR: '" + key + "' is not listed in '_order' and won't be processed"
+                self._abort(msg)
+
         return self._parms["_order"]
 
     def get_variable_names(self, category_name):
@@ -82,10 +100,21 @@ class yaml_parsing_class(object):
         self._config_keyword to the keys in default_value and returns the
         most appropriate default
         """
-        use_key = "default"
-        # TODO: Check to make sure default is a key
+        # default must be a key in the default_value dictionary!
+        if "default" not in self._parms[category_name][variable_name]["default_value"].keys():
+            msg = "ERROR: variable '" + variable_name + "' does not have default key in default_value"
+            self._abort(msg)
 
+        # return "default" entry in default_values dictionary unless one of the provided keys matches
+        use_key = "default"
         for key in self._provided_keys:
             if key in self._parms[category_name][variable_name]["default_value"].keys():
                 use_key = key
         return self._parms[category_name][variable_name]["default_value"][use_key]
+
+    def _abort(self, err_code=0):
+        """
+        This routine imports sys and calls exit
+        """
+        import sys
+        sys.exit(err_code)
