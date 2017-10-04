@@ -31,7 +31,7 @@
 #
 # TODO: parameters that are arrays?
 
-_order : ["general_parms", "PFT_counts"]
+_order : ["general_parms", "PFT_counts", "PFT_derived_types"]
 
 # Category 1: General Parameters
 general_parms :
@@ -153,12 +153,102 @@ general_parms :
       default_value : # default value is resolution dependent!
          default : 1.1
          grid = CESM_x3 : 5.0
+   parm_init_POP_bury_coeff :
+      longname : Initial scale factor for burial of POP
+      category : general parameter
+      units : unitless
+      datatype : real
+      default_value : # default value is resolution dependent!
+         default : 1.1
+         grid = CESM_x3 : 5.0
+   parm_init_bSi_bury_coeff :
+      longname : Initial scale factor for burial of bSi
+      category : general parameter
+      units : unitless
+      datatype : real
+      default_value : # default value is resolution dependent!
+         default : 1.0
+         grid = CESM_x3 : 1.1
+   parm_Fe_scavenge_rate0 :
+      longname : Scavenging base rate for Fe
+      category : general parameter
+      units : unitless
+      datatype : real
+      default_value : 15
+   parm_Lig_scavenge_rate0 :
+      longname : Scavenging base rate for bound ligand
+      category : general parameter
+      units : unitless
+      datatype : real
+      default_value : 0.015
+   parm_FeLig_scavenge_rate0 :
+      longname : Scavenging base rate for bound iron
+      category : general parameter
+      units : unitless
+      datatype : real
+      default_value : 1.3
+   parm_Lig_degrade_rate0 :
+      longname : Fe-binding ligand bacterial degradation base rate coefficient
+      category : general parameter
+      units : unitless
+      datatype : real
+      default_value : 0.000094
+   parm_Fe_desorption_rate0 :
+      longname : Desorption rate for scavenged Fe from particles
+      category : general parameter
+      units : unitless
+      datatype : real
+      default_value : 1e-6
+   parm_f_prod_sp_CaCO3 :
+      longname : Fraction of sp production as CaCO3 production
+      category : general parameter
+      units : unitless
+      datatype : real
+      default_value : # default value is resolution dependent!
+         default : 0.07
+         grid = CESM_x3 : 0.075
+   parm_POC_diss :
+      longname : Base POC dissipation length scale
+      category : general parameter
+      units : cm
+      datatype : real
+      default_value : 100e2
+   parm_SiO2_diss :
+      longname : Base SiO2 dissipation length scale
+      category : general parameter
+      units : cm
+      datatype : real
+      default_value : 770e2
+   parm_CaCO3_diss :
+      longname : Base CaCO3 dissipation length scale
+      category : general parameter
+      units : cm
+      datatype : real
+      default_value : 500e2
+   parm_sed_denitrif_coeff :
+      longname : Global scaling factor for sed_denitrif
+      category : general parameter
+      units : unitless
+      datatype : real
+      default_value : 1
+   bury_coeff_rmean_timescale_years :
+      longname : Running mean time scale for bury coefficients
+      category : general parameter
+      units : years
+      datatype : real
+      default_value : 10
    parm_scalelen_z :
-      longname : prescribed scalelen values
+      longname : Depths of prescribed scalelen values
       category : Scale lengths
       units : cm
       datatype : real(4)
       default_value : 100.0e2, 250.0e2, 500.0e2, 1000.0e2
+   parm_scalelen_vals :
+      longname : Prescribed scalelen values
+      category : Scale lengths
+      units : unitless
+      datatype : real(4)
+      default_value : 1, 2.2, 4, 5
 
 # Category 2: PFT_counts
 PFT_counts :
@@ -184,17 +274,42 @@ PFT_counts :
       default_value : 3
 
 # Category 3: PFTs
-# PFTs :
-#    autotrophs(1) :
-#       short_name :
-#          longname : The short name of the autotroph class in autotrophs(1)
-#          category : PFTs
-#          units : unitless
-#          datatype : integer
-#          default_value :
-#             default : 'UNSET'
-#             PFT_defaults = CESM : 'sp'
-#       long_name :
-#          default_value :
-#             default : 'UNSET'
-#             PFT_defaults = CESM : 'sp'
+PFT_derived_types :
+   autotrophs :
+      category : autotrophs
+      datatype :
+         # Components of the derived type
+         # (_type_name is not part of the type)
+         _type_name : autotrophs_type(:)
+         sname :
+            longname : Short name of the autotroph
+            units : non-numeric
+            datatype : string
+            default_value :
+               default : UNSET
+               autotroph = sp : sp
+               autotroph = diat : diat
+               autotroph = diaz : diaz
+         lname :
+            longname : Long name of the autotroph
+            units : non-numeric
+            datatype : string
+            default_value :
+               default : UNSET
+               autotroph = sp : Small Phyto
+               autotroph = diat : Diatom
+               autotroph = diaz : Diazotroph
+         Nfixer :
+            longname : Flag set to true if autotroph fixes nitrogen
+            units : non-numeric
+            datatype : logical
+            default_value :
+               default : false
+               autotroph = diaz : true
+         imp_calcifier :
+            longname : Flag set to true if autotroph implicitly handles calcification
+            units : non-numeric
+            datatype : logical
+            default_value :
+               default : false
+               autotroph = sp : true

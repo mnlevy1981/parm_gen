@@ -221,25 +221,6 @@ module marbl_settings_mod
   !!! Prev Comment: !   inventories on timescales exceeding bury_coeff_rmean_timescale_years
   !!! Prev Comment: !   (this is done primarily in spinup runs)
 
-  real(r8), target :: &
-       parm_kappa_nitrif,          & ! nitrification inverse time constant (1/sec) (derived from parm_kappa_nitrif_per_day)
-       parm_init_POP_bury_coeff,   & ! initial scale factor for burial of POP
-       parm_init_bSi_bury_coeff,   & ! initial scale factor burial of bSi
-       parm_Fe_scavenge_rate0,     & ! scavenging base rate for Fe
-       parm_Lig_scavenge_rate0,    & ! scavenging base rate for bound ligand
-       parm_FeLig_scavenge_rate0,  & ! scavenging base rate for bound iron
-       parm_Lig_degrade_rate0,     & ! Fe-binding ligand bacterial degradation base rate coefficient
-       parm_Fe_desorption_rate0,   & ! desorption rate for scavenged Fe from particles
-       parm_f_prod_sp_CaCO3,       & ! fraction of sp prod. as CaCO3 prod.
-       parm_POC_diss,              & ! base POC diss len scale
-       parm_SiO2_diss,             & ! base SiO2 diss len scale
-       parm_CaCO3_diss,            & ! base CaCO3 diss len scale
-       parm_sed_denitrif_coeff,    & ! global scaling factor for sed_denitrif
-       bury_coeff_rmean_timescale_years
-
-  real(r8), dimension(4), target :: &
-       parm_scalelen_vals       ! prescribed scalelen values
-
   real(r8),                target :: iron_frac_in_dust            ! fraction by weight of iron in dust
   real(r8),                target :: iron_frac_in_bc              ! fraction by weight of iron in black carbon
   character(len=char_len), target :: caco3_bury_thres_opt         ! option of threshold of caco3 burial ['fixed_depth', 'omega_calc']
@@ -281,9 +262,10 @@ module marbl_settings_mod
   character(len=char_len), allocatable, target, dimension(:) :: tracer_restore_vars
 
   !---------------------------------------------------------------------
-  !  Auxiliary variables (str -> int conversions, indices, etc)
+  !  Auxiliary variables (unit conversions, str -> int conversions, indices, etc)
   !---------------------------------------------------------------------
 
+  real(r8)                      :: parm_kappa_nitrif
   integer (int_kind)            :: caco3_bury_thres_iopt
   integer (int_kind), parameter :: caco3_bury_thres_iopt_fixed_depth = 1
   integer (int_kind), parameter :: caco3_bury_thres_iopt_omega_calc  = 2
@@ -319,19 +301,6 @@ contains
   subroutine marbl_settings_set_defaults_general_parms()
 
     !## default general_parms
-    parm_init_POP_bury_coeff   = 1.1_r8          ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    parm_init_bSi_bury_coeff   = 1.0_r8          ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    parm_Fe_scavenge_rate0     = 15.0_r8         ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    parm_Lig_scavenge_rate0    = 0.015_r8        ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    parm_FeLig_scavenge_rate0  = 1.3_r8          ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    parm_Lig_degrade_rate0     = 0.000094_r8     ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    parm_Fe_desorption_rate0   = 1.0e-6_r8       ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    parm_f_prod_sp_CaCO3       = 0.070_r8        ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    parm_POC_diss              = 100.0e2_r8      ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    parm_SiO2_diss             = 770.0e2_r8      ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    parm_CaCO3_diss            = 500.0e2_r8      ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    parm_sed_denitrif_coeff    = 1.0_r8          ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
-    bury_coeff_rmean_timescale_years = 10.0_r8   ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
     parm_scalelen_vals = (/     1.0_r8,     2.2_r8,     4.0_r8,      5.0_r8 /)  ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
 
     iron_frac_in_dust      = 0.035_r8 * 0.01_r8  ! CESM USERS - DO NOT CHANGE HERE! POP calls put_setting() for this var, see CESM NOTE above
