@@ -47,6 +47,12 @@ general_parms :
                     - sp
                     - diat
                     - diaz
+         zooplankton :
+                     - zoo
+         grazing :
+                 - sp_zoo
+                 - diat_zoo
+                 - diaz_zoo
       append_to_config_keywords : true
    ciso_on :
       longname : Control whether CISO tracer module is active
@@ -246,14 +252,24 @@ general_parms :
       longname : Depths of prescribed scalelen values
       category : Scale lengths
       units : cm
-      datatype : real(4)
-      default_value : 100.0e2, 250.0e2, 500.0e2, 1000.0e2
+      datatype : real
+      _array_size : 4
+      default_value :
+                    - 100.0e2
+                    - 250.0e2
+                    - 500.0e2
+                    - 1000.0e2
    parm_scalelen_vals :
       longname : Prescribed scalelen values
       category : Scale lengths
       units : unitless
-      datatype : real(4)
-      default_value : 1, 2.2, 4, 5
+      datatype : real
+      _array_size : 4
+      default_value :
+                    - 1
+                    - 2.2
+                    - 4
+                    - 5
 
 # Category 2: PFT_counts
 PFT_counts :
@@ -282,11 +298,11 @@ PFT_counts :
 PFT_derived_types :
    autotrophs :
       category : autotrophs
+      _array_size : autotroph_cnt
       datatype :
          # Components of the derived type
-         # (_type_name is not part of the type)
-         _type_name : autotrophs_type(:)
-         _type_size : autotroph_cnt
+         # (_* are not part of the type)
+         _type_name : autotrophs_type
          sname :
             longname : Short name of the autotroph
             units : non-numeric
@@ -341,7 +357,90 @@ PFT_derived_types :
                autotrophs = sp : 0.03e-3
                autotrophs = diat : 0.06e-3
                autotrophs = diaz : 0.045e-3
-
-
-
-
+         kPO4 :
+            longname : PO4 uptake half-sat constant
+            units : ()
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = sp : 0.005
+               autotrophs = diat : 0.05
+               autotrophs = diaz : 0.015
+         kDOP :
+            longname : DOP uptake half-sat constant
+            units : ()
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = sp : 0.3
+               autotrophs = diat : 0.5
+               autotrophs = diaz : 0.075
+         kNO3 :
+            longname : NO3 uptake half-sat constant
+            units : ()
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = sp : 0.25
+               autotrophs = diat : 0.5
+               autotrophs = diaz : 2
+         kNH4 :
+            longname : NH4 uptake half-sat constant
+            units : ()
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = sp : 0.01
+               autotrophs = diat : 0.05
+               autotrophs = diaz : 0.2
+         kSiO3 :
+            longname : SiO3 uptake half-sat constant
+            units : ()
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = sp : 0
+               autotrophs = diat : 0.7
+               autotrophs = diaz : 0
+   zooplankton :
+      category : zooplankton
+      _array_size : zooplankton_cnt
+      datatype :
+         # Components of the derived type
+         # (_* are not part of the type)
+         _type_name : zooplankton_type
+         sname :
+            longname : Short name of the zooplankton
+            units : non-numeric
+            datatype : string
+            default_value :
+               default : UNSET
+               zooplankton = zoo : zoo
+         lname :
+            longname : Long name of the zooplankton
+            units : non-numeric
+            datatype : string
+            default_value :
+               default : UNSET
+               zooplankton = zoo : Zooplankton
+         z_mort_0_per_day :
+            longname : Linear mortality rate
+            units : 1/day
+            datatype : real
+            default_value :
+               default : 1e34
+               zooplankton = zoo : 0.1
+         z_mort2_0_per_day :
+            longname : Quadratic mortality rate
+            units : 1/day / (mmol C/m^3)
+            datatype : real
+            default_value :
+               default : 1e34
+               zooplankton = zoo : 0.4
+         loss_thres :
+            longname : Zoo concentration where losses go to zero
+            units : ()
+            datatype : real
+            default_value :
+               default : 1e34
+               zooplankton = zoo : 0.075

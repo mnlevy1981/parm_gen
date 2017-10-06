@@ -1,7 +1,6 @@
 class MARBL_defaults_class(object):
-    """
-    This class contains methods to allow python to interact with the YAML file that
-    defines the MARBL parameters and sets default values
+    """ This class contains methods to allow python to interact with the YAML file that
+        defines the MARBL parameters and sets default values
     """
 
     ###############
@@ -9,9 +8,8 @@ class MARBL_defaults_class(object):
     ###############
 
     def __init__(self, yaml_file, grid, input_file):
-        """
-        Class constructor: set up a dictionary of config keywords for when multiple
-        default values are provided, and then read the YAML file.
+        """ Class constructor: set up a dictionary of config keywords for when multiple
+            default values are provided, and then read the YAML file.
         """
         from collections import OrderedDict
 
@@ -50,8 +48,7 @@ class MARBL_defaults_class(object):
     #                        Or maybe combine YAML and inputfile during __init__?
 
     def get_category_names(self):
-        """
-        Returns category names as determined by the '_order' key in YAML
+        """ Returns category names as determined by the '_order' key in YAML
         """
 
         # Consistency checks:
@@ -79,33 +76,41 @@ class MARBL_defaults_class(object):
         return self._parms["_order"]
 
     def get_variable_names(self, category_name):
+        """ Returns a sorted list of variables in a specific category.
+            For now, variables are sorted alphabetically.
         """
-        Returns a sorted list of variables in a specific category.
-        For now, variables are sorted alphabetically.
-        """
-        return sorted(self._parms[category_name].keys(), key=lambda s: s.lower())
+        return _sort(self._parms[category_name].keys())
 
     def process_variable_value(self, category_name, variable_name):
-        this_var = self._parms[category_name][variable_name]
+        """ For a given variable in a given category, add to the self.parm_dict dictionary
+            * For derived types and arrays, multiple entries will be added to self.parm_dict
 
-        # Is the variable datatype a dictionary? If so, it is a derived type
-        # and needs to be handled differently
-        if isinstance(this_var["datatype"], dict):
-            if isinstance(this_var["datatype"]["_type_size"],int):
-                tsize = this_var["datatype"]["_type_size"]
+            At this time, the only derived types in the YAML file are also arrays
+        """
+        this_var = self._parms[category_name][variable_name]
+        # Is the variable an array? If so, treat each entry separately
+        if ("_array_size" in this_var.keys()):
+            # How many elements? May be an integer or an entry in self.parm_dict
+            # TODO: add support for 2D arrays!
+            if isinstance(this_var["_array_size"],int):
+                array_size = this_var["_array_size"]
             else:
-                tsize = self.parm_dict[this_var["datatype"]["_type_size"]]
-            for n in range(0,tsize):
-                var_root = "%s(%d)%%" % (variable_name, n+1)
-                local_keys = list(self._provided_keys)
-                if category_name == "PFT_derived_types" and self.parm_dict['PFT_defaults'] == '"CESM2"':
-                    local_keys.append("%s = %s" % (variable_name, self._parms['general_parms']['PFT_defaults']['_CESM2_PFT_keys'][variable_name][n]))
-                for key in this_var["datatype"].keys():
-                    if key[0] != '_':
-                        derived_var_name = var_root + key
-                        self.parm_dict[derived_var_name] = _get_var_value(this_var["datatype"][key], local_keys)
-            return
-        self.parm_dict[variable_name] = _get_var_value(this_var, self._provided_keys)
+                array_size = self.parm_dict[this_var["_array_size"]]
+            for n in range(0,array_size):
+                elem_name = "%s(%d)" % (variable_name, n+1)
+                # Is this an array of a derived type? If so, treat each element separately
+                if isinstance(this_var["datatype"], dict):
+                    local_keys = list(self._provided_keys)
+                    if category_name == "PFT_derived_types" and self.parm_dict['PFT_defaults'] == '"CESM2"':
+                        local_keys.append("%s = %s" % (variable_name, self._parms['general_parms']['PFT_defaults']['_CESM2_PFT_keys'][variable_name][n]))
+                    for key in _sort(this_var["datatype"].keys()):
+                        if key[0] != '_':
+                            derived_elem_name = elem_name + "%" + key
+                            self.parm_dict[derived_elem_name] = _get_var_value(this_var["datatype"][key], local_keys)
+                else: # Not derived type
+                    self.parm_dict[elem_name] = _get_var_value(this_var, self._provided_keys)[n]
+        else: # not an array
+            self.parm_dict[variable_name] = _get_var_value(this_var, self._provided_keys)
 
 
     ###################
@@ -121,18 +126,17 @@ class MARBL_defaults_class(object):
 ##########################
 
 def _abort(err_code=0):
-    """
-    This routine imports sys and calls exit
+    """ This routine imports sys and calls exit
     """
     import sys
     sys.exit(err_code)
 
 def _get_var_value(var_dict, provided_keys):
-    """
-    Return the correct default value for a variable in the MARBL YAML parameter file
-    INPUTS:
-        * dictionary containing variable information (req: longname, datatype and default_value keys)
-        * list of keys to try to match in default_value
+    """ Return the correct default value for a variable in the MARBL YAML parameter
+        file INPUTS:
+            * dictionary containing variable information (req: longname, datatype
+              and default_value keys)
+            * list of keys to try to match in default_value
     """
     # is default value a dictionary? If so, it depends on self._config_keyword
     # Otherwise we're interested in default value
@@ -159,3 +163,9 @@ def _get_var_value(var_dict, provided_keys):
     if var_dict["datatype"] == "string":
         return '"%s"' % def_value
     return def_value
+
+def _sort(a_list, sort_key=lambda s: s.lower()):
+    """ Sort a list; default is alphabetical (case-insensitive), but that
+        can be overridden with the sort_key argument
+    """
+    return sorted(a_list, key=sort_key)
