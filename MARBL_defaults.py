@@ -88,6 +88,12 @@ class MARBL_defaults_class(object):
             At this time, the only derived types in the YAML file are also arrays
         """
         this_var = self._parms[category_name][variable_name]
+        # Some default values depend on variables from previous categories
+        # So we make a local copy of self._provided_keys and append variables as necessary
+        local_keys = list(self._provided_keys)
+        if category_name == "PFT_counts":
+            local_keys.append("PFT_defaults = %s" % self.parm_dict['PFT_defaults'].strip('\"'))
+
         # Is the variable an array? If so, treat each entry separately
         if ("_array_size" in this_var.keys()):
             # How many elements? May be an integer or an entry in self.parm_dict
@@ -97,24 +103,31 @@ class MARBL_defaults_class(object):
             else:
                 array_size = self.parm_dict[this_var["_array_size"]]
             for n in range(0,array_size):
+                # Append "(index)" to variable name
                 elem_name = "%s(%d)" % (variable_name, n+1)
+
                 # Is this an array of a derived type? If so, treat each element separately
                 if isinstance(this_var["datatype"], dict):
-                    local_keys = list(self._provided_keys)
-                    if category_name == "PFT_derived_types" and self.parm_dict['PFT_defaults'] == '"CESM2"':
+                    append_to_keys = (category_name == "PFT_derived_types" and
+                                      self.parm_dict['PFT_defaults'].strip('\"') == "CESM2")
+                    if append_to_keys:
+                        # Add key for specific PFT
                         local_keys.append("%s = %s" % (variable_name, self._parms['general_parms']['PFT_defaults']['_CESM2_PFT_keys'][variable_name][n]))
                     for key in _sort(this_var["datatype"].keys()):
                         if key[0] != '_':
                             derived_elem_name = elem_name + "%" + key
                             self.parm_dict[derived_elem_name] = _get_var_value(this_var["datatype"][key], local_keys)
+                    if append_to_keys:
+                        # Remove PFT-specific key
+                        del local_keys[-1]
                 else: # Not derived type
-                    var_value = _get_var_value(this_var, self._provided_keys)
+                    var_value = _get_var_value(this_var, local_keys)
                     if (isinstance(var_value, list)):
                         self.parm_dict[elem_name] = var_value[n]
                     else:
                         self.parm_dict[elem_name] = var_value
         else: # not an array
-            self.parm_dict[variable_name] = _get_var_value(this_var, self._provided_keys)
+            self.parm_dict[variable_name] = _get_var_value(this_var, local_keys)
 
 
     ###################

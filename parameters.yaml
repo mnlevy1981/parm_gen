@@ -41,7 +41,9 @@ general_parms :
       units : unitless
       datatype : string
       default_value : CESM2
-      valid_values : CESM2, user-specified
+      valid_values :
+                   - CESM2
+                   - user-specified
       _CESM2_PFT_keys :
          autotrophs :
                     - sp
@@ -270,6 +272,45 @@ general_parms :
                     - 2.2
                     - 4
                     - 5
+   iron_frac_in_dust :
+      longname : Fraction by weight of iron in dust
+      category : general parameter
+      units : unitless
+      datatype : real
+      default_value : 0.035e-2
+   iron_frac_in_bc :
+      longname : Fraction by weight of iron in black carbon
+      category : general parameter
+      units : unitless
+      datatype : real
+      default_value : 0.06
+   caco3_bury_thres_opt :
+      longname : Option of threshold of CaCO3 burial
+      category : general parameter
+      units : non-numeric
+      datatype : string
+      default_value : omega_calc
+      valid_values :
+                   - fixed_depth
+                   - omega_calc
+   caco3_bury_thres_depth :
+      longname : Threshold depth for CaCO3 burial when opt = 'fixed_depth'
+      category : general parameter
+      units : cm
+      datatype : real
+      default_value : 3000e2
+   PON_bury_coeff :
+      longname : Scale factor for burial of PON
+      category : general parameter
+      units : unitless
+      datatype : real
+      default_value : 0.5
+   ciso_fract_factors :
+      longname : Option for which biological fractionation calculation to use
+      category : general parameter
+      units : non-numeric
+      datatype : string
+      default_value : Rau
 
 # Category 2: PFT_counts
 PFT_counts :
@@ -278,7 +319,9 @@ PFT_counts :
       category : config PFTs
       units : unitless
       datatype : integer
-      default_value : 3
+      default_value :
+         default : 1
+         PFT_defaults = CESM2 : 3
       cannot change : PFT_defaults == 'CESM2'
       must set : PFT_defaults == 'user-specified'
    zooplankton_cnt :
@@ -286,19 +329,24 @@ PFT_counts :
       category : config PFTs
       units : unitless
       datatype : integer
-      default_value : 1
+      default_value :
+         default : 1
+         PFT_defaults = CESM2 : 1
    max_grazer_prey_cnt :
       longname : Number of grazer prey classes
       category : config PFTs
       units : unitless
       datatype : integer
-      default_value : 3
+      default_value :
+         default : 3
+         PFT_defaults = CESM2 : 1
 
 # Category 3: PFTs
 PFT_derived_types :
    autotrophs :
       category : autotrophs
       _array_size : autotroph_cnt
+      _is_allocatable : true
       datatype :
          # Components of the derived type
          # (_* are not part of the type)
@@ -350,7 +398,7 @@ PFT_derived_types :
                autotrophs = diat : true
          kFe :
             longname : Fe uptake half-sat constant
-            units : ()
+            units : nmol/cm^3
             datatype : real
             default_value :
                default : 1e34
@@ -359,7 +407,7 @@ PFT_derived_types :
                autotrophs = diaz : 0.045e-3
          kPO4 :
             longname : PO4 uptake half-sat constant
-            units : ()
+            units : nmol/cm^3
             datatype : real
             default_value :
                default : 1e34
@@ -368,7 +416,7 @@ PFT_derived_types :
                autotrophs = diaz : 0.015
          kDOP :
             longname : DOP uptake half-sat constant
-            units : ()
+            units : nmol/cm^3
             datatype : real
             default_value :
                default : 1e34
@@ -377,7 +425,7 @@ PFT_derived_types :
                autotrophs = diaz : 0.075
          kNO3 :
             longname : NO3 uptake half-sat constant
-            units : ()
+            units : nmol/cm^3
             datatype : real
             default_value :
                default : 1e34
@@ -386,7 +434,7 @@ PFT_derived_types :
                autotrophs = diaz : 2
          kNH4 :
             longname : NH4 uptake half-sat constant
-            units : ()
+            units : nmol/cm^3
             datatype : real
             default_value :
                default : 1e34
@@ -395,7 +443,7 @@ PFT_derived_types :
                autotrophs = diaz : 0.2
          kSiO3 :
             longname : SiO3 uptake half-sat constant
-            units : ()
+            units : nmol/cm^3
             datatype : real
             default_value :
                default : 1e34
@@ -405,6 +453,7 @@ PFT_derived_types :
    zooplankton :
       category : zooplankton
       _array_size : zooplankton_cnt
+      _is_allocatable : true
       datatype :
          # Components of the derived type
          # (_* are not part of the type)
@@ -439,7 +488,7 @@ PFT_derived_types :
                zooplankton = zoo : 0.4
          loss_thres :
             longname : Zoo concentration where losses go to zero
-            units : ()
+            units : nmol/cm^3
             datatype : real
             default_value :
                default : 1e34
@@ -451,5 +500,6 @@ tracer_dependent :
       category : tracer restoring
       units : non-numeric
       datatype : string
-      _array_size : 46
+      _array_size : 32
+      _is_allocatable : true
       default_value : ''
