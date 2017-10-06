@@ -42,6 +42,11 @@ general_parms :
       datatype : string
       default_value : CESM2
       valid_values : CESM2, user-specified
+      _CESM2_PFT_keys :
+         autotrophs :
+                    - sp
+                    - diat
+                    - diaz
       append_to_config_keywords : true
    ciso_on :
       longname : Control whether CISO tracer module is active
@@ -281,35 +286,62 @@ PFT_derived_types :
          # Components of the derived type
          # (_type_name is not part of the type)
          _type_name : autotrophs_type(:)
+         _type_size : autotroph_cnt
          sname :
             longname : Short name of the autotroph
             units : non-numeric
             datatype : string
             default_value :
                default : UNSET
-               autotroph = sp : sp
-               autotroph = diat : diat
-               autotroph = diaz : diaz
+               autotrophs = sp : sp
+               autotrophs = diat : diat
+               autotrophs = diaz : diaz
          lname :
             longname : Long name of the autotroph
             units : non-numeric
             datatype : string
             default_value :
                default : UNSET
-               autotroph = sp : Small Phyto
-               autotroph = diat : Diatom
-               autotroph = diaz : Diazotroph
+               autotrophs = sp : Small Phyto
+               autotrophs = diat : Diatom
+               autotrophs = diaz : Diazotroph
          Nfixer :
             longname : Flag set to true if autotroph fixes nitrogen
             units : non-numeric
             datatype : logical
             default_value :
                default : false
-               autotroph = diaz : true
+               autotrophs = diaz : true
          imp_calcifier :
             longname : Flag set to true if autotroph implicitly handles calcification
             units : non-numeric
             datatype : logical
             default_value :
                default : false
-               autotroph = sp : true
+               autotrophs = sp : true
+         exp_calcifier :
+            longname : Flag set to true if autotroph explicitly handles calcification
+            units : non-numeric
+            datatype : logical
+            default_value :
+               default : false
+         silicifier :
+            longname : Flag set to true if autotroph is a silicifier
+            units : non-numeric
+            datatype : logical
+            default_value :
+               default : false
+               autotrophs = diat : true
+         kFe :
+            longname : Fe uptake half-sat constant
+            units : ()
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = sp : 0.03e-3
+               autotrophs = diat : 0.06e-3
+               autotrophs = diaz : 0.045e-3
+
+
+
+

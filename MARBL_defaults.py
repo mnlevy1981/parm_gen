@@ -4,31 +4,29 @@ class MARBL_defaults_class(object):
     defines the MARBL parameters and sets default values
     """
 
-###############
-# CONSTRUCTOR #
-###############
+    ###############
+    # CONSTRUCTOR #
+    ###############
 
     def __init__(self, yaml_file, grid, input_file):
         """
         Class constructor: set up a dictionary of config keywords for when multiple
         default values are provided, and then read the YAML file.
         """
-        # 1. Set up dictionary of config keywords as well as a list
-        self._config_keyword = dict()
+        from collections import OrderedDict
+
+        # 1. Set up dictionary of config keywords
+        self._config_keyword = OrderedDict()
         self._config_keyword['grid'] = grid
 
         # 2. Or maybe we want a list?
         self._provided_keys = []
         self._provided_keys.append("grid = " + self._config_keyword['grid'])
 
-        # 3. Empty dictionary for keeping variable, value pairs
-        self.parm_dict = dict()
+        # 3. Empty [ordered] dictionary for keeping variable, value pairs
+        self.parm_dict = OrderedDict()
 
-        # 4. Or maybe a list will be easier to keep in proper order?
-        self.parm_varname = []
-        self.parm_value = []
-
-        # 5. Read YAML file
+        # 4. Read YAML file
         import yaml
         with open(yaml_file) as parmsfile:
             self._parms = yaml.safe_load(parmsfile)
@@ -37,18 +35,19 @@ class MARBL_defaults_class(object):
         #    (Currently not implemented)
         if input_file is not None:
             _abort("ERROR: input_file is not a supported option at this time")
-##################
-# PUBLIC METHODS #
-##################
 
-# TODO:
-#       1. PFT defaults (separate YAML file?)
-#       2. Parse an input file
-#          i.   figure  out workflow (read YAML then over-write?)
-#          ii.  things like PFT array sizes will be tricky!
-#          iii. Thought: two dictionarys, self._parms (renamed self._yaml_parms) and self._input_parms
-#                        Look in _input_parms first, if no key match then fallback to YAML?
-#                        Or maybe combine YAML and inputfile during __init__?
+    ##################
+    # PUBLIC METHODS #
+    ##################
+
+    # TODO:
+    #       1. PFT defaults (separate YAML file?)
+    #       2. Parse an input file
+    #          i.   figure  out workflow (read YAML then over-write?)
+    #          ii.  things like PFT array sizes will be tricky!
+    #          iii. Thought: two dictionarys, self._parms (renamed self._yaml_parms) and self._input_parms
+    #                        Look in _input_parms first, if no key match then fallback to YAML?
+    #                        Or maybe combine YAML and inputfile during __init__?
 
     def get_category_names(self):
         """
@@ -92,19 +91,30 @@ class MARBL_defaults_class(object):
         # Is the variable datatype a dictionary? If so, it is a derived type
         # and needs to be handled differently
         if isinstance(this_var["datatype"], dict):
+            if isinstance(this_var["datatype"]["_type_size"],int):
+                tsize = this_var["datatype"]["_type_size"]
+            else:
+                tsize = self.parm_dict[this_var["datatype"]["_type_size"]]
+            for n in range(0,tsize):
+                var_root = "%s(%d)%%" % (variable_name, n+1)
+                local_keys = list(self._provided_keys)
+                if category_name == "PFT_derived_types" and self.parm_dict['PFT_defaults'] == '"CESM2"':
+                    local_keys.append("%s = %s" % (variable_name, self._parms['general_parms']['PFT_defaults']['_CESM2_PFT_keys'][variable_name][n]))
+                for key in this_var["datatype"].keys():
+                    if key[0] != '_':
+                        derived_var_name = var_root + key
+                        self.parm_dict[derived_var_name] = _get_var_value(this_var["datatype"][key], local_keys)
             return
         self.parm_dict[variable_name] = _get_var_value(this_var, self._provided_keys)
-        self.parm_varname.append(variable_name)
-        self.parm_value.append(self.parm_dict[variable_name])
 
 
-###################
-# PRIVATE METHODS #
-###################
+    ###################
+    # PRIVATE METHODS #
+    ###################
 
-# TODO: define _value_is_valid()
-#       i.  datatype match?
-#       ii. optional valid_value key check
+    # TODO: define _value_is_valid()
+    #       i.  datatype match?
+    #       ii. optional valid_value key check
 
 ##########################
 # PRIVATE MODULE METHODS #
