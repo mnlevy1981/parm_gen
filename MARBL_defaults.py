@@ -108,7 +108,11 @@ class MARBL_defaults_class(object):
                             derived_elem_name = elem_name + "%" + key
                             self.parm_dict[derived_elem_name] = _get_var_value(this_var["datatype"][key], local_keys)
                 else: # Not derived type
-                    self.parm_dict[elem_name] = _get_var_value(this_var, self._provided_keys)[n]
+                    var_value = _get_var_value(this_var, self._provided_keys)
+                    if (isinstance(var_value, list)):
+                        self.parm_dict[elem_name] = var_value[n]
+                    else:
+                        self.parm_dict[elem_name] = var_value
         else: # not an array
             self.parm_dict[variable_name] = _get_var_value(this_var, self._provided_keys)
 

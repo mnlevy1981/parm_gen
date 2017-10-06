@@ -31,7 +31,7 @@
 #
 # TODO: parameters that are arrays?
 
-_order : ["general_parms", "PFT_counts", "PFT_derived_types"]
+_order : ["general_parms", "PFT_counts", "PFT_derived_types", "tracer_dependent"]
 
 # Category 1: General Parameters
 general_parms :
@@ -444,3 +444,12 @@ PFT_derived_types :
             default_value :
                default : 1e34
                zooplankton = zoo : 0.075
+
+tracer_dependent :
+   tracer_restore_vars :
+      longname : Tracer names for tracers that are restored
+      category : tracer restoring
+      units : non-numeric
+      datatype : string
+      _array_size : 46
+      default_value : ''
