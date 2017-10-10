@@ -507,9 +507,9 @@ PFT_derived_types :
             datatype : string
             default_value :
                default : UNSET
-               grazing = sp_zoo : sp_zoo
-               grazing = diat_zoo : diat_zoo
-               grazing = diaz_zoo : diaz_zoo
+               grazing = sp_zoo : grz_sp_zoo
+               grazing = diat_zoo : grz_diat_zoo
+               grazing = diaz_zoo : grz_diaz_zoo
          lname :
             longname : Long name of the grazing relationship
             units : non-numeric
@@ -519,7 +519,92 @@ PFT_derived_types :
                grazing = sp_zoo : Grazing of sp by zoo
                grazing = diat_zoo : Grazing of diat by zoo
                grazing = diaz_zoo : Grazing of diaz by zoo
-
+         auto_ind_cnt :
+            longname : Number of autotrophs being grazed
+            units : unitless
+            datatype : integer
+            default_value :
+               default : 1
+         zoo_ind_cnt :
+            longname : Number of zooplankton being grazed
+            units : unitless
+            datatype : integer
+            default_value :
+               default : 0
+         grazing_function :
+            longname : Functional form of grazing parameterization
+            units : unitless
+            datatype : integer
+            _comment : 1 => Michaelis-Menten, 2 => Sigmoidal
+            default_value : 1
+         z_umax_0_per_day :
+            longname : Max zoo growth rate at tref
+            units : 1/day
+            datatype : real
+            default_value :
+               default : 1e34
+               grazing = sp_zoo : 3.3
+               grazing = diat_zoo : 3.05
+               grazing = diaz_zoo : 3.1
+         z_grz :
+            longname : Grazing coefficient
+            units : (mmol C/m^3)^2
+            datatype : real
+            default_value :
+               default : 1e34
+               grazing = sp_zoo : 1.2
+               grazing = diat_zoo : 1.2
+               grazing = diaz_zoo : 1.2
+         graze_zoo :
+            longname : Routing of grazed term, remainder goes to dic
+            units : unitless
+            datatype : real
+            default_value :
+               default : 1e34
+               grazing = sp_zoo : 0.3
+               grazing = diat_zoo : 0.25
+               grazing = diaz_zoo : 0.3
+         graze_poc :
+            longname : Routing of grazed term, remainder goes to dic
+            units : unitless
+            datatype : real
+            default_value :
+               default : 1e34
+               grazing = sp_zoo : 0
+               grazing = diat_zoo : 0.38
+               grazing = diaz_zoo : 0.1
+         graze_doc :
+            longname : Routing of grazed term, remainder goes to dic
+            units : unitless
+            datatype : real
+            default_value :
+               default : 1e34
+               grazing = sp_zoo : 0.06
+               grazing = diat_zoo : 0.06
+               grazing = diaz_zoo : 0.06
+         f_zoo_detr :
+            longname : Fraction of zoo losses to detrital
+            units : unitless
+            datatype : real
+            default_value :
+               default : 1e34
+               grazing = sp_zoo : 0.12
+               grazing = diat_zoo : 0.24
+               grazing = diaz_zoo : 0.12
+         auto_ind :
+            _array_size : autotroph_cnt
+            _is_allocatable : true
+            longname : Indices of autotrophs being grazed
+            units : unitless
+            datatype : integer
+            default_value : 0
+#         zoo_ind :
+#            _array_size : Indices of zooplankton being grazed
+#            _is_allocatable : true
+#            longname : Indices of zooplankton being grazed
+#            units : unitless
+#            datatype : integer
+#            default_value : 0
 
 tracer_dependent :
    tracer_restore_vars :
