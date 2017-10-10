@@ -338,8 +338,8 @@ PFT_counts :
       units : unitless
       datatype : integer
       default_value :
-         default : 3
-         PFT_defaults = CESM2 : 1
+         default : 1
+         PFT_defaults = CESM2 : 3
 
 # Category 3: PFTs
 PFT_derived_types :
@@ -493,6 +493,33 @@ PFT_derived_types :
             default_value :
                default : 1e34
                zooplankton = zoo : 0.075
+   grazing :
+      category : grazing
+      _array_size :
+                  - max_grazer_prey_cnt
+                  - zooplankton_cnt
+      _is_allocatable : true
+      datatype :
+         _type_name : grazing_type
+         sname :
+            longname : Short name of the grazing relationship
+            units : non-numeric
+            datatype : string
+            default_value :
+               default : UNSET
+               grazing = sp_zoo : sp_zoo
+               grazing = diat_zoo : diat_zoo
+               grazing = diaz_zoo : diaz_zoo
+         lname :
+            longname : Long name of the grazing relationship
+            units : non-numeric
+            datatype : string
+            default_value :
+               default : UNSET
+               grazing = sp_zoo : Grazing of sp by zoo
+               grazing = diat_zoo : Grazing of diat by zoo
+               grazing = diaz_zoo : Grazing of diaz by zoo
+
 
 tracer_dependent :
    tracer_restore_vars :

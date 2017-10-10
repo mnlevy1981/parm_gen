@@ -96,15 +96,10 @@ class MARBL_defaults_class(object):
 
         # Is the variable an array? If so, treat each entry separately
         if ("_array_size" in this_var.keys()):
-            # How many elements? May be an integer or an entry in self.parm_dict
-            # TODO: add support for 2D arrays!
-            if isinstance(this_var["_array_size"],int):
-                array_size = this_var["_array_size"]
-            else:
-                array_size = self.parm_dict[this_var["_array_size"]]
-            for n in range(0,array_size):
+
+            for n, elem_index in enumerate(_get_array_info(this_var["_array_size"], self.parm_dict)):
                 # Append "(index)" to variable name
-                elem_name = "%s(%d)" % (variable_name, n+1)
+                elem_name = "%s%s" % (variable_name, elem_index)
 
                 # Is this an array of a derived type? If so, treat each element separately
                 if isinstance(this_var["datatype"], dict):
@@ -142,11 +137,15 @@ class MARBL_defaults_class(object):
 # PRIVATE MODULE METHODS #
 ##########################
 
+################################################################################
+
 def _abort(err_code=0):
     """ This routine imports sys and calls exit
     """
     import sys
     sys.exit(err_code)
+
+################################################################################
 
 def _get_var_value(var_dict, provided_keys):
     """ Return the correct default value for a variable in the MARBL YAML parameter
@@ -181,8 +180,55 @@ def _get_var_value(var_dict, provided_keys):
         return '"%s"' % def_value
     return def_value
 
+################################################################################
+
 def _sort(a_list, sort_key=lambda s: s.lower()):
     """ Sort a list; default is alphabetical (case-insensitive), but that
         can be overridden with the sort_key argument
     """
     return sorted(a_list, key=sort_key)
+
+################################################################################
+
+def _get_dim_size(dim_in, parm_dict):
+    """ If dim_in is an integer, it is the dimension size. Otherwise we need to
+        look up the dim_in key in parm_dict.
+    """
+    # TODO: figure out what to do with tracer count (it's not in the YAML file,
+    # but it is needed for tracer_restore_vars)
+
+    if isinstance(dim_in, int):
+        return dim_in
+    return parm_dict[dim_in]
+################################################################################
+
+def _get_array_info(array_size_in, parm_dict):
+    """ Return a list of the proper formatting for array elements, e.g.
+            ['(1)', '(2)'] for 1D array or
+            ['(1,1)', '(2,1)'] for 2D array
+    """
+
+    # List to be returned:
+    str_index = []
+
+    # How many dimensions?
+    if isinstance(array_size_in, list):
+        # Error checking:
+        # This script only support 2D arrays for now
+        # (and assumes array_size_in is not a list for 1D arrays)
+        if len(array_size_in) > 2:
+            print "ERROR: _get_array_info() only supports 1D and 2D arrays"
+            _abort()
+
+        for i in range(0, _get_dim_size(array_size_in[0], parm_dict)):
+            for j in range(0, _get_dim_size(array_size_in[1], parm_dict)):
+                str_index.append("(%d,%d)" % (i+1,j+1))
+        return str_index
+
+    # How many elements? May be an integer or an entry in self.parm_dict
+    for i in range(0, _get_dim_size(array_size_in, parm_dict)):
+        str_index.append("(%d)" % (i+1))
+    return str_index
+
+################################################################################
+
