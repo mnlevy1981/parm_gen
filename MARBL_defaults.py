@@ -1,6 +1,9 @@
 class MARBL_defaults_class(object):
     """ This class contains methods to allow python to interact with the YAML file that
-        defines the MARBL parameters and sets default values
+        defines the MARBL parameters and sets default values.
+
+        This file also contains several subroutines that are not part of the class but are
+        called by member functions in the class.
     """
 
     ###############
@@ -28,8 +31,24 @@ class MARBL_defaults_class(object):
 
         # 4. Read input file
         #    (Currently not implemented)
-        if input_file is not None:
-            _abort("ERROR: input_file is not a supported option at this time")
+        self._input_dict = dict()
+        try:
+            f = open(input_file, "r")
+            for line in f:
+                if len(line.lstrip()) == 0:
+                    # ignore empty lines
+                    continue
+                if line.lstrip()[0] == '!':
+                    # Ignore comments in input file!
+                    continue
+                line_list = line.strip().split('=')
+                self._input_dict[line_list[0].strip()] = line_list[1].strip()
+            f.close()
+        except TypeError:
+            # If inputfile == None then the open will result in TypeError
+            pass
+        except:
+            _abort("ERROR: input_file '%f' was not found")
 
         # 5. Use an ordered dictionary for keeping variable, value pairs
         self.parm_dict = OrderedDict()
@@ -42,8 +61,7 @@ class MARBL_defaults_class(object):
     ##################
 
     # TODO:
-    #       1. PFT defaults (separate YAML file?)
-    #       2. Parse an input file
+    #       Parse an input file
     #          i.   figure  out workflow (read YAML then over-write?)
     #          ii.  things like PFT array sizes will be tricky!
     #          iii. Thought: two dictionarys, self._parms (renamed self._yaml_parms) and self._input_parms
@@ -138,18 +156,18 @@ class MARBL_defaults_class(object):
                     for key in _sort(this_var["datatype"].keys()):
                         if key[0] != '_':
                             derived_elem_name = elem_name + "%" + key
-                            self.parm_dict[derived_elem_name] = _get_var_value(this_var["datatype"][key], local_keys)
+                            self.parm_dict[derived_elem_name] = _get_var_value(derived_elem_name, this_var["datatype"][key], local_keys, self._input_dict)
                     if append_to_keys:
                         # Remove PFT-specific key
                         del local_keys[-1]
                 else: # Not derived type
-                    var_value = _get_var_value(this_var, local_keys)
+                    var_value = _get_var_value(elem_name, this_var, local_keys, self._input_dict)
                     if (isinstance(var_value, list)):
                         self.parm_dict[elem_name] = var_value[n]
                     else:
                         self.parm_dict[elem_name] = var_value
         else: # not an array
-            self.parm_dict[variable_name] = _get_var_value(this_var, local_keys)
+            self.parm_dict[variable_name] = _get_var_value(variable_name, this_var, local_keys, self._input_dict)
 
 ##########################
 # PRIVATE MODULE METHODS #
@@ -165,29 +183,35 @@ def _abort(err_code=0):
 
 ################################################################################
 
-def _get_var_value(var_dict, provided_keys):
+def _get_var_value(varname, var_dict, provided_keys, input_dict):
     """ Return the correct default value for a variable in the MARBL YAML parameter
         file INPUTS:
             * dictionary containing variable information (req: longname, datatype
               and default_value keys)
             * list of keys to try to match in default_value
+            * dictionary containing values from input file
     """
-    # is default value a dictionary? If so, it depends on self._config_keyword
-    # Otherwise we're interested in default value
-    if isinstance(var_dict["default_value"], dict):
-        # default must be a key in the default_value dictionary!
-        if "default" not in var_dict["default_value"].keys():
-            msg = "ERROR: " + var_dict["longname"] + " does not have a default key in default_value"
-            _abort(msg)
-
-        # return "default" entry in default_values dictionary unless one of the provided keys matches
-        use_key = "default"
-        for key in provided_keys:
-            if key in var_dict["default_value"].keys():
-                use_key = key
-        def_value = var_dict["default_value"][use_key]
+    # Either get value from input file or from the YAML
+    if varname in input_dict.keys():
+        # Ignore ' and " from strings
+        def_value = input_dict[varname].strip('"').strip("'")
     else:
-        def_value = var_dict["default_value"]
+        # is default value a dictionary? If so, it depends on self._config_keyword
+        # Otherwise we're interested in default value
+        if isinstance(var_dict["default_value"], dict):
+            # default must be a key in the default_value dictionary!
+            if "default" not in var_dict["default_value"].keys():
+                msg = "ERROR: " + var_dict["longname"] + " does not have a default key in default_value"
+                _abort(msg)
+
+            # return "default" entry in default_values dictionary unless one of the provided keys matches
+            use_key = "default"
+            for key in provided_keys:
+                if key in var_dict["default_value"].keys():
+                    use_key = key
+            def_value = var_dict["default_value"][use_key]
+        else:
+            def_value = var_dict["default_value"]
 
     # call value validation check
 
@@ -226,8 +250,6 @@ def _get_dim_size(dim_in, parm_dict):
     """ If dim_in is an integer, it is the dimension size. Otherwise we need to
         look up the dim_in key in parm_dict.
     """
-    # TODO: figure out what to do with tracer count (it's not in the YAML file,
-    # but it is needed for tracer_restore_vars)
 
     if isinstance(dim_in, dict):
         dim_start = dim_in['default']
