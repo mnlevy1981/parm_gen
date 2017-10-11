@@ -29,10 +29,15 @@
 # 3. must set:
 # 4. append_to_config_keywords:
 #
-# TODO: parameters that are arrays?
 
 _order : ["general_parms", "PFT_counts", "PFT_derived_types", "tracer_dependent"]
-_ecosys_base_tracer_cnt : &NT 32
+
+# Tracer count
+_tracer_cnt : &TRACER_CNT
+   default : 32
+   increments :
+      lvariable_PtoC = .false. : -3
+      ciso_on = .true. : 14
 
 # Category 1: General Parameters
 general_parms :
@@ -617,9 +622,6 @@ tracer_dependent :
       category : tracer restoring
       units : non-numeric
       datatype : string
-      _array_size : *NT
-      _array_size_increment :
-         lvariable_PtoC = .false. : -3
-         ciso_on = .true. : 14
+      _array_size : *TRACER_CNT
       _is_allocatable : true
       default_value : ''

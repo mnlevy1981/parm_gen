@@ -54,12 +54,10 @@ class MARBL_defaults_class(object):
 
     def get_tracer_cnt(self):
         """ Return the number of tracers MARBL is running with.
-            This implementation is a little kludgy, returning the dimsize of tracer_restore_vars
-            Computing directly from self._parms['_ecosys_base_tracer_cnt'] would be ideal but it's
-            not clear how that would mesh with tracer_restore_vars determining array size.
         """
-        restore_vars = self._parms['tracer_dependent']['tracer_restore_vars']
-        return _get_dim_size(restore_vars['_array_size'], restore_vars['_array_size_increment'], self.parm_dict)
+
+        return (self._parms['_tracer_cnt']['default'] +
+                _add_increments(self._parms['_tracer_cnt']['increments'], self.parm_dict))
 
     ################################################################################
 
@@ -77,7 +75,7 @@ class MARBL_defaults_class(object):
         # 2. All keys listed in self._parms.keys() should also be in self._parms["_order"]
         #    (except _order itself)
         for key in self._parms.keys():
-            if key not in ["_order", "_ecosys_base_tracer_cnt"] and key not in self._parms["_order"]:
+            if key not in ["_order", "_tracer_cnt"] and key not in self._parms["_order"]:
                 msg = "ERROR: '" + key + "' is not listed in '_order' and won't be processed"
                 _abort(msg)
 
@@ -125,11 +123,8 @@ class MARBL_defaults_class(object):
 
         # Is the variable an array? If so, treat each entry separately
         if ("_array_size" in this_var.keys()):
-            increment = None
-            if "_array_size_increment" in this_var.keys():
-                increment = this_var["_array_size_increment"]
 
-            for n, elem_index in enumerate(_get_array_info(this_var["_array_size"], increment, self.parm_dict)):
+            for n, elem_index in enumerate(_get_array_info(this_var["_array_size"], self.parm_dict)):
                 # Append "(index)" to variable name
                 elem_name = "%s%s" % (variable_name, elem_index)
 
@@ -213,26 +208,44 @@ def _sort(a_list, sort_key=lambda s: s.lower()):
 
 ################################################################################
 
-def _get_dim_size(dim_in, dim_increment, parm_dict):
+def _add_increments(increments, parm_dict):
+    """ Some values need to be adjusted depending on values in parm_dict
+    """
+    change = 0
+    for key_check in increments.keys():
+        checklist = key_check.split(" = ")
+        if parm_dict[checklist[0]] == checklist[1]:
+            change = change + increments[key_check]
+    return change
+
+################################################################################
+
+def _get_dim_size(dim_in, parm_dict):
     """ If dim_in is an integer, it is the dimension size. Otherwise we need to
         look up the dim_in key in parm_dict.
     """
     # TODO: figure out what to do with tracer count (it's not in the YAML file,
     # but it is needed for tracer_restore_vars)
 
-    if isinstance(dim_in, int):
-        dim_out = dim_in
+    if isinstance(dim_in, dict):
+        dim_start = dim_in['default']
+        check_increment = ('increments' in dim_in.keys())
     else:
-        dim_out = parm_dict[dim_in]
-    if dim_increment is not None:
-        for tests in dim_increment.keys():
-            checks = tests.split(" = ")
-            if parm_dict[checks[0]] == checks[1]:
-                dim_out = dim_out + dim_increment[tests]
+        dim_start = dim_in
+        check_increment = False
+
+    if isinstance(dim_start, int):
+        dim_out = dim_start
+    else:
+        dim_out = parm_dict[dim_start]
+
+    if check_increment:
+        dim_out = dim_out + _add_increments(dim_in['increments'], parm_dict)
+
     return dim_out
 ################################################################################
 
-def _get_array_info(array_size_in, dim_increment, parm_dict):
+def _get_array_info(array_size_in, parm_dict):
     """ Return a list of the proper formatting for array elements, e.g.
             ['(1)', '(2)'] for 1D array or
             ['(1,1)', '(2,1)'] for 2D array
@@ -250,13 +263,13 @@ def _get_array_info(array_size_in, dim_increment, parm_dict):
             print "ERROR: _get_array_info() only supports 1D and 2D arrays"
             _abort()
 
-        for i in range(0, _get_dim_size(array_size_in[0], dim_increment, parm_dict)):
-            for j in range(0, _get_dim_size(array_size_in[1], dim_increment, parm_dict)):
+        for i in range(0, _get_dim_size(array_size_in[0], parm_dict)):
+            for j in range(0, _get_dim_size(array_size_in[1], parm_dict)):
                 str_index.append("(%d,%d)" % (i+1,j+1))
         return str_index
 
     # How many elements? May be an integer or an entry in self.parm_dict
-    for i in range(0, _get_dim_size(array_size_in, dim_increment, parm_dict)):
+    for i in range(0, _get_dim_size(array_size_in, parm_dict)):
         str_index.append("(%d)" % (i+1))
     return str_index
 
