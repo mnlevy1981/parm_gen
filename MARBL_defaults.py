@@ -196,6 +196,8 @@ def _get_var_value(var_dict, provided_keys):
     # if variable is a string, put quotes around the default value
     if var_dict["datatype"] == "string":
         return '"%s"' % def_value
+    if var_dict["datatype"] == "real" and isinstance(def_value, str):
+        return "%20.15e" % eval(def_value)
     return def_value
 
 ################################################################################

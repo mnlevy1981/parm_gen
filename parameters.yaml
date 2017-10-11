@@ -456,6 +456,132 @@ PFT_derived_types :
                autotrophs = "sp" : 0
                autotrophs = "diat" : 0.7
                autotrophs = "diaz" : 0
+         Qp_fixed :
+            longname : P/C ratio when using fixed P/C ratios
+            units : unitless
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = "sp" : 1.0/117
+               autotrophs = "diat" : 1.0/117
+               autotrophs = "diaz" : 0.32/117
+         gQfe_0 :
+            longname : Initial Fe/C ratio for growth
+            units : unitless
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = "sp" : 35e-6
+               autotrophs = "diat" : 35e-6
+               autotrophs = "diaz" : 70e-6
+         gQfe_min :
+            longname : Minimum Fe/C ratio for growth
+            units : unitless
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = "sp" : 3e-6
+               autotrophs = "diat" : 3e-6
+               autotrophs = "diaz" : 6e-6
+         alphaPI_per_day :
+            longname : Initial slope of P_I curve (GD98)
+            units : mmol C m^2/(mg Chl W day)
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = "sp" : 0.39
+               autotrophs = "diat" : 0.29
+               autotrophs = "diaz" : 0.39
+         PCref_per_day :
+            longname : Maximum C-spec growth rate at Tref
+            units : 1/day
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = "sp" : 5
+               autotrophs = "diat" : 5
+               autotrophs = "diaz" : 2.2
+         thetaN_max :
+            longname : Maximum thetaN (Chl / N)
+            units : mg Chl / mmol N
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = "sp" : 2.5
+               autotrophs = "diat" : 4
+               autotrophs = "diaz" : 2.5
+         loss_thres :
+            longname : concentration where losses go to zero
+            units : nmol/cm^3
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = "sp" : 0.01
+               autotrophs = "diat" : 0.02
+               autotrophs = "diaz" : 0.02
+         loss_thres2 :
+            longname : concentration where losses go to zero
+            units : nmol/cm^3
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = "sp" : 0
+               autotrophs = "diat" : 0
+               autotrophs = "diaz" : 0.001
+         temp_thres :
+            longname : Temperature where concentration threshold and photosynthesis rate drops 
+            units : deg C
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = "sp" : -10
+               autotrophs = "diat" : -10
+               autotrophs = "diaz" : 15
+         mort_per_day :
+            longname : Linear mortality rate
+            units : 1/day
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = "sp" : 0.1
+               autotrophs = "diat" : 0.1
+               autotrophs = "diaz" : 0.1
+         mort2_per_day :
+            longname : Quadratic mortality rate
+            units : (1/day)/(mmol C/m^3)
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = "sp" : 0.01
+               autotrophs = "diat" : 0.01
+               autotrophs = "diaz" : 0.01
+         agg_rate_max :
+            longname : Maximum agg rate
+            units : 1/day
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = "sp" : 0.5
+               autotrophs = "diat" : 0.5
+               autotrophs = "diaz" : 0.5
+         agg_rate_min :
+            longname : Minimum agg rate
+            units : 1/day
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = "sp" : 0.01
+               autotrophs = "diat" : 0.02
+               autotrophs = "diaz" : 0.01
+         loss_poc :
+            longname : Routing of loss term
+            units : unitless
+            datatype : real
+            default_value :
+               default : 1e34
+               autotrophs = "sp" : 0
+               autotrophs = "diat" : 0
+               autotrophs = "diaz" : 0
    zooplankton :
       category : zooplankton
       _array_size : zooplankton_cnt
