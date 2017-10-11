@@ -32,6 +32,7 @@
 # TODO: parameters that are arrays?
 
 _order : ["general_parms", "PFT_counts", "PFT_derived_types", "tracer_dependent"]
+_ecosys_base_tracer_cnt : &NT 32
 
 # Category 1: General Parameters
 general_parms :
@@ -61,61 +62,61 @@ general_parms :
       category : config flags
       units : unitless
       datatype : logical
-      default_value : false
+      default_value : .false.
    lsource_sink :
       longname : Control which portions of code are executed (useful for debugging)
       category : config flags
       units : unitless
       datatype : logical
-      default_value : true
+      default_value : .true.
    ciso_lsource_sink :
       longname : Control which portions of the carbon isotope code are executed (useful for debugging)
       category : config flags
       units : unitless
       datatype : logical
-      default_value : true
+      default_value : .true.
    lecovars_full_depth_tavg :
       longname : Control whether base ecosystem variables are written full depth
       category : config flags
       units : unitless
       datatype : logical
-      default_value : false
+      default_value : .false.
    ciso_lecovars_full_depth_tavg :
       longname : Control whether carbon isotope variables are written full depth
       category : config flags
       units : unitless
       datatype : logical
-      default_value : false
+      default_value : .false.
    lflux_gas_o2 :
       longname : Control which portions of code are executed (useful for debugging)
       category : config flags
       units : unitless
       datatype : logical
-      default_value : true
+      default_value : .true.
    lflux_gas_co2 :
       longname : Control which portions of code are executed (useful for debugging)
       category : config flags
       units : unitless
       datatype : logical
-      default_value : true
+      default_value : .true.
    lcompute_nhx_surface_emis :
       longname : Control if NHx emissions are computed
       category : config flags
       units : unitless
       datatype : logical
-      default_value : true
+      default_value : .true.
    lvariable_PtoC :
       longname : Control if PtoC ratios in autotrophs vary
       category : config flags
       units : unitless
       datatype : logical
-      default_value : true
+      default_value : .true.
    ladjust_bury_coeff :
       longname : Control if bury coefficients are adjusted (rather than constant)
       category : config flags
       units : unitless
       datatype : logical
-      default_value : false
+      default_value : .false.
    init_bury_coeff_opt :
       longname : Source of initial burial coefficient
       category : config strings
@@ -321,7 +322,7 @@ PFT_counts :
       datatype : integer
       default_value :
          default : 1
-         PFT_defaults = CESM2 : 3
+         PFT_defaults = "CESM2" : 3
       cannot change : PFT_defaults == 'CESM2'
       must set : PFT_defaults == 'user-specified'
    zooplankton_cnt :
@@ -331,7 +332,7 @@ PFT_counts :
       datatype : integer
       default_value :
          default : 1
-         PFT_defaults = CESM2 : 1
+         PFT_defaults = "CESM2" : 1
    max_grazer_prey_cnt :
       longname : Number of grazer prey classes
       category : config PFTs
@@ -339,7 +340,7 @@ PFT_counts :
       datatype : integer
       default_value :
          default : 1
-         PFT_defaults = CESM2 : 3
+         PFT_defaults = "CESM2" : 3
 
 # Category 3: PFTs
 PFT_derived_types :
@@ -357,99 +358,99 @@ PFT_derived_types :
             datatype : string
             default_value :
                default : UNSET
-               autotrophs = sp : sp
-               autotrophs = diat : diat
-               autotrophs = diaz : diaz
+               autotrophs = "sp" : sp
+               autotrophs = "diat" : diat
+               autotrophs = "diaz" : diaz
          lname :
             longname : Long name of the autotroph
             units : non-numeric
             datatype : string
             default_value :
                default : UNSET
-               autotrophs = sp : Small Phyto
-               autotrophs = diat : Diatom
-               autotrophs = diaz : Diazotroph
+               autotrophs = "sp" : Small Phyto
+               autotrophs = "diat" : Diatom
+               autotrophs = "diaz" : Diazotroph
          Nfixer :
             longname : Flag set to true if autotroph fixes nitrogen
             units : non-numeric
             datatype : logical
             default_value :
-               default : false
-               autotrophs = diaz : true
+               default : .false.
+               autotrophs = "diaz" : .true.
          imp_calcifier :
             longname : Flag set to true if autotroph implicitly handles calcification
             units : non-numeric
             datatype : logical
             default_value :
-               default : false
-               autotrophs = sp : true
+               default : .false.
+               autotrophs = "sp" : .true.
          exp_calcifier :
             longname : Flag set to true if autotroph explicitly handles calcification
             units : non-numeric
             datatype : logical
             default_value :
-               default : false
+               default : .false.
          silicifier :
             longname : Flag set to true if autotroph is a silicifier
             units : non-numeric
             datatype : logical
             default_value :
-               default : false
-               autotrophs = diat : true
+               default : .false.
+               autotrophs = "diat" : .true.
          kFe :
             longname : Fe uptake half-sat constant
             units : nmol/cm^3
             datatype : real
             default_value :
                default : 1e34
-               autotrophs = sp : 0.03e-3
-               autotrophs = diat : 0.06e-3
-               autotrophs = diaz : 0.045e-3
+               autotrophs = "sp" : 0.03e-3
+               autotrophs = "diat" : 0.06e-3
+               autotrophs = "diaz" : 0.045e-3
          kPO4 :
             longname : PO4 uptake half-sat constant
             units : nmol/cm^3
             datatype : real
             default_value :
                default : 1e34
-               autotrophs = sp : 0.005
-               autotrophs = diat : 0.05
-               autotrophs = diaz : 0.015
+               autotrophs = "sp" : 0.005
+               autotrophs = "diat" : 0.05
+               autotrophs = "diaz" : 0.015
          kDOP :
             longname : DOP uptake half-sat constant
             units : nmol/cm^3
             datatype : real
             default_value :
                default : 1e34
-               autotrophs = sp : 0.3
-               autotrophs = diat : 0.5
-               autotrophs = diaz : 0.075
+               autotrophs = "sp" : 0.3
+               autotrophs = "diat" : 0.5
+               autotrophs = "diaz" : 0.075
          kNO3 :
             longname : NO3 uptake half-sat constant
             units : nmol/cm^3
             datatype : real
             default_value :
                default : 1e34
-               autotrophs = sp : 0.25
-               autotrophs = diat : 0.5
-               autotrophs = diaz : 2
+               autotrophs = "sp" : 0.25
+               autotrophs = "diat" : 0.5
+               autotrophs = "diaz" : 2
          kNH4 :
             longname : NH4 uptake half-sat constant
             units : nmol/cm^3
             datatype : real
             default_value :
                default : 1e34
-               autotrophs = sp : 0.01
-               autotrophs = diat : 0.05
-               autotrophs = diaz : 0.2
+               autotrophs = "sp" : 0.01
+               autotrophs = "diat" : 0.05
+               autotrophs = "diaz" : 0.2
          kSiO3 :
             longname : SiO3 uptake half-sat constant
             units : nmol/cm^3
             datatype : real
             default_value :
                default : 1e34
-               autotrophs = sp : 0
-               autotrophs = diat : 0.7
-               autotrophs = diaz : 0
+               autotrophs = "sp" : 0
+               autotrophs = "diat" : 0.7
+               autotrophs = "diaz" : 0
    zooplankton :
       category : zooplankton
       _array_size : zooplankton_cnt
@@ -464,35 +465,35 @@ PFT_derived_types :
             datatype : string
             default_value :
                default : UNSET
-               zooplankton = zoo : zoo
+               zooplankton = "zoo" : zoo
          lname :
             longname : Long name of the zooplankton
             units : non-numeric
             datatype : string
             default_value :
                default : UNSET
-               zooplankton = zoo : Zooplankton
+               zooplankton = "zoo" : Zooplankton
          z_mort_0_per_day :
             longname : Linear mortality rate
             units : 1/day
             datatype : real
             default_value :
                default : 1e34
-               zooplankton = zoo : 0.1
+               zooplankton = "zoo" : 0.1
          z_mort2_0_per_day :
             longname : Quadratic mortality rate
             units : 1/day / (mmol C/m^3)
             datatype : real
             default_value :
                default : 1e34
-               zooplankton = zoo : 0.4
+               zooplankton = "zoo" : 0.4
          loss_thres :
             longname : Zoo concentration where losses go to zero
             units : nmol/cm^3
             datatype : real
             default_value :
                default : 1e34
-               zooplankton = zoo : 0.075
+               zooplankton = "zoo" : 0.075
    grazing :
       category : grazing
       _array_size :
@@ -507,18 +508,18 @@ PFT_derived_types :
             datatype : string
             default_value :
                default : UNSET
-               grazing = sp_zoo : grz_sp_zoo
-               grazing = diat_zoo : grz_diat_zoo
-               grazing = diaz_zoo : grz_diaz_zoo
+               grazing = "sp_zoo" : grz_sp_zoo
+               grazing = "diat_zoo" : grz_diat_zoo
+               grazing = "diaz_zoo" : grz_diaz_zoo
          lname :
             longname : Long name of the grazing relationship
             units : non-numeric
             datatype : string
             default_value :
                default : UNSET
-               grazing = sp_zoo : Grazing of sp by zoo
-               grazing = diat_zoo : Grazing of diat by zoo
-               grazing = diaz_zoo : Grazing of diaz by zoo
+               grazing = "sp_zoo" : Grazing of sp by zoo
+               grazing = "diat_zoo" : Grazing of diat by zoo
+               grazing = "diaz_zoo" : Grazing of diaz by zoo
          auto_ind_cnt :
             longname : Number of autotrophs being grazed
             units : unitless
@@ -543,63 +544,67 @@ PFT_derived_types :
             datatype : real
             default_value :
                default : 1e34
-               grazing = sp_zoo : 3.3
-               grazing = diat_zoo : 3.05
-               grazing = diaz_zoo : 3.1
+               grazing = "sp_zoo" : 3.3
+               grazing = "diat_zoo" : 3.05
+               grazing = "diaz_zoo" : 3.1
          z_grz :
             longname : Grazing coefficient
             units : (mmol C/m^3)^2
             datatype : real
             default_value :
                default : 1e34
-               grazing = sp_zoo : 1.2
-               grazing = diat_zoo : 1.2
-               grazing = diaz_zoo : 1.2
+               grazing = "sp_zoo" : 1.2
+               grazing = "diat_zoo" : 1.2
+               grazing = "diaz_zoo" : 1.2
          graze_zoo :
             longname : Routing of grazed term, remainder goes to dic
             units : unitless
             datatype : real
             default_value :
                default : 1e34
-               grazing = sp_zoo : 0.3
-               grazing = diat_zoo : 0.25
-               grazing = diaz_zoo : 0.3
+               grazing = "sp_zoo" : 0.3
+               grazing = "diat_zoo" : 0.25
+               grazing = "diaz_zoo" : 0.3
          graze_poc :
             longname : Routing of grazed term, remainder goes to dic
             units : unitless
             datatype : real
             default_value :
                default : 1e34
-               grazing = sp_zoo : 0
-               grazing = diat_zoo : 0.38
-               grazing = diaz_zoo : 0.1
+               grazing = "sp_zoo" : 0
+               grazing = "diat_zoo" : 0.38
+               grazing = "diaz_zoo" : 0.1
          graze_doc :
             longname : Routing of grazed term, remainder goes to dic
             units : unitless
             datatype : real
             default_value :
                default : 1e34
-               grazing = sp_zoo : 0.06
-               grazing = diat_zoo : 0.06
-               grazing = diaz_zoo : 0.06
+               grazing = "sp_zoo" : 0.06
+               grazing = "diat_zoo" : 0.06
+               grazing = "diaz_zoo" : 0.06
          f_zoo_detr :
             longname : Fraction of zoo losses to detrital
             units : unitless
             datatype : real
             default_value :
                default : 1e34
-               grazing = sp_zoo : 0.12
-               grazing = diat_zoo : 0.24
-               grazing = diaz_zoo : 0.12
+               grazing = "sp_zoo" : 0.12
+               grazing = "diat_zoo" : 0.24
+               grazing = "diaz_zoo" : 0.12
          auto_ind :
             _array_size : autotroph_cnt
             _is_allocatable : true
             longname : Indices of autotrophs being grazed
             units : unitless
             datatype : integer
-            default_value : 0
+            default_value :
+               default : 0
+               grazing = "sp_zoo" : 1 # index where autotroph_name = sp
+               grazing = "diat_zoo" : 2 # index where autotroph_name = diat
+               grazing = "diaz_zoo" : 3 # index where autotroph_name = diaz
 #         zoo_ind :
-#            _array_size : Indices of zooplankton being grazed
+#            _array_size : zooplankton_cnt
 #            _is_allocatable : true
 #            longname : Indices of zooplankton being grazed
 #            units : unitless
@@ -612,6 +617,9 @@ tracer_dependent :
       category : tracer restoring
       units : non-numeric
       datatype : string
-      _array_size : 32
+      _array_size : *NT
+      _array_size_increment :
+         lvariable_PtoC = .false. : -3
+         ciso_on = .true. : 14
       _is_allocatable : true
       default_value : ''

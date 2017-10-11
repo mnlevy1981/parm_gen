@@ -21,18 +21,21 @@ class MARBL_defaults_class(object):
         self._provided_keys = []
         self._provided_keys.append("grid = " + self._config_keyword['grid'])
 
-        # 3. Empty [ordered] dictionary for keeping variable, value pairs
-        self.parm_dict = OrderedDict()
-
-        # 4. Read YAML file
+        # 3. Read YAML file
         import yaml
         with open(yaml_file) as parmsfile:
             self._parms = yaml.safe_load(parmsfile)
 
-        # 6. Read input file
+        # 4. Read input file
         #    (Currently not implemented)
         if input_file is not None:
             _abort("ERROR: input_file is not a supported option at this time")
+
+        # 5. Use an ordered dictionary for keeping variable, value pairs
+        self.parm_dict = OrderedDict()
+        for cat_name in self.get_category_names():
+            for var_name in self.get_variable_names(cat_name):
+                self._process_variable_value(cat_name, var_name)
 
     ##################
     # PUBLIC METHODS #
@@ -46,6 +49,19 @@ class MARBL_defaults_class(object):
     #          iii. Thought: two dictionarys, self._parms (renamed self._yaml_parms) and self._input_parms
     #                        Look in _input_parms first, if no key match then fallback to YAML?
     #                        Or maybe combine YAML and inputfile during __init__?
+
+    ################################################################################
+
+    def get_tracer_cnt(self):
+        """ Return the number of tracers MARBL is running with.
+            This implementation is a little kludgy, returning the dimsize of tracer_restore_vars
+            Computing directly from self._parms['_ecosys_base_tracer_cnt'] would be ideal but it's
+            not clear how that would mesh with tracer_restore_vars determining array size.
+        """
+        restore_vars = self._parms['tracer_dependent']['tracer_restore_vars']
+        return _get_dim_size(restore_vars['_array_size'], restore_vars['_array_size_increment'], self.parm_dict)
+
+    ################################################################################
 
     def get_category_names(self):
         """ Returns category names as determined by the '_order' key in YAML
@@ -61,7 +77,7 @@ class MARBL_defaults_class(object):
         # 2. All keys listed in self._parms.keys() should also be in self._parms["_order"]
         #    (except _order itself)
         for key in self._parms.keys():
-            if key not in ["_order"] and key not in self._parms["_order"]:
+            if key not in ["_order", "_ecosys_base_tracer_cnt"] and key not in self._parms["_order"]:
                 msg = "ERROR: '" + key + "' is not listed in '_order' and won't be processed"
                 _abort(msg)
 
@@ -75,13 +91,26 @@ class MARBL_defaults_class(object):
 
         return self._parms["_order"]
 
+    ################################################################################
+
     def get_variable_names(self, category_name):
         """ Returns a sorted list of variables in a specific category.
             For now, variables are sorted alphabetically.
         """
         return _sort(self._parms[category_name].keys())
 
-    def process_variable_value(self, category_name, variable_name):
+    ################################################################################
+
+
+    ###################
+    # PRIVATE METHODS #
+    ###################
+
+    # TODO: define _value_is_valid()
+    #       i.  datatype match?
+    #       ii. optional valid_value key check
+
+    def _process_variable_value(self, category_name, variable_name):
         """ For a given variable in a given category, add to the self.parm_dict dictionary
             * For derived types and arrays, multiple entries will be added to self.parm_dict
 
@@ -92,12 +121,15 @@ class MARBL_defaults_class(object):
         # So we make a local copy of self._provided_keys and append variables as necessary
         local_keys = list(self._provided_keys)
         if category_name == "PFT_counts":
-            local_keys.append("PFT_defaults = %s" % self.parm_dict['PFT_defaults'].strip('\"'))
+            local_keys.append("PFT_defaults = %s" % self.parm_dict['PFT_defaults'])
 
         # Is the variable an array? If so, treat each entry separately
         if ("_array_size" in this_var.keys()):
+            increment = None
+            if "_array_size_increment" in this_var.keys():
+                increment = this_var["_array_size_increment"]
 
-            for n, elem_index in enumerate(_get_array_info(this_var["_array_size"], self.parm_dict)):
+            for n, elem_index in enumerate(_get_array_info(this_var["_array_size"], increment, self.parm_dict)):
                 # Append "(index)" to variable name
                 elem_name = "%s%s" % (variable_name, elem_index)
 
@@ -107,7 +139,7 @@ class MARBL_defaults_class(object):
                                       self.parm_dict['PFT_defaults'].strip('\"') == "CESM2")
                     if append_to_keys:
                         # Add key for specific PFT
-                        local_keys.append("%s = %s" % (variable_name, self._parms['general_parms']['PFT_defaults']['_CESM2_PFT_keys'][variable_name][n]))
+                        local_keys.append('%s = "%s"' % (variable_name, self._parms['general_parms']['PFT_defaults']['_CESM2_PFT_keys'][variable_name][n]))
                     for key in _sort(this_var["datatype"].keys()):
                         if key[0] != '_':
                             derived_elem_name = elem_name + "%" + key
@@ -123,15 +155,6 @@ class MARBL_defaults_class(object):
                         self.parm_dict[elem_name] = var_value
         else: # not an array
             self.parm_dict[variable_name] = _get_var_value(this_var, local_keys)
-
-
-    ###################
-    # PRIVATE METHODS #
-    ###################
-
-    # TODO: define _value_is_valid()
-    #       i.  datatype match?
-    #       ii. optional valid_value key check
 
 ##########################
 # PRIVATE MODULE METHODS #
@@ -190,7 +213,7 @@ def _sort(a_list, sort_key=lambda s: s.lower()):
 
 ################################################################################
 
-def _get_dim_size(dim_in, parm_dict):
+def _get_dim_size(dim_in, dim_increment, parm_dict):
     """ If dim_in is an integer, it is the dimension size. Otherwise we need to
         look up the dim_in key in parm_dict.
     """
@@ -198,11 +221,18 @@ def _get_dim_size(dim_in, parm_dict):
     # but it is needed for tracer_restore_vars)
 
     if isinstance(dim_in, int):
-        return dim_in
-    return parm_dict[dim_in]
+        dim_out = dim_in
+    else:
+        dim_out = parm_dict[dim_in]
+    if dim_increment is not None:
+        for tests in dim_increment.keys():
+            checks = tests.split(" = ")
+            if parm_dict[checks[0]] == checks[1]:
+                dim_out = dim_out + dim_increment[tests]
+    return dim_out
 ################################################################################
 
-def _get_array_info(array_size_in, parm_dict):
+def _get_array_info(array_size_in, dim_increment, parm_dict):
     """ Return a list of the proper formatting for array elements, e.g.
             ['(1)', '(2)'] for 1D array or
             ['(1,1)', '(2,1)'] for 2D array
@@ -220,13 +250,13 @@ def _get_array_info(array_size_in, parm_dict):
             print "ERROR: _get_array_info() only supports 1D and 2D arrays"
             _abort()
 
-        for i in range(0, _get_dim_size(array_size_in[0], parm_dict)):
-            for j in range(0, _get_dim_size(array_size_in[1], parm_dict)):
+        for i in range(0, _get_dim_size(array_size_in[0], dim_increment, parm_dict)):
+            for j in range(0, _get_dim_size(array_size_in[1], dim_increment, parm_dict)):
                 str_index.append("(%d,%d)" % (i+1,j+1))
         return str_index
 
     # How many elements? May be an integer or an entry in self.parm_dict
-    for i in range(0, _get_dim_size(array_size_in, parm_dict)):
+    for i in range(0, _get_dim_size(array_size_in, dim_increment, parm_dict)):
         str_index.append("(%d)" % (i+1))
     return str_index
 

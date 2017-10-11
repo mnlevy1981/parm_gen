@@ -38,14 +38,9 @@ DefaultParms = MARBL_defaults_class(args.yaml_file, args.grid, args.input_file)
 # BEGIN SCRIPT #
 ################
 
-#first_cat = True
-for cat_name in DefaultParms.get_category_names():
-    for var_name in DefaultParms.get_variable_names(cat_name):
-        DefaultParms.process_variable_value(cat_name, var_name)
-
-# TODO: we probably want this in a dictionary, but need a smart way to sort it
+# TODO: we need a smart way to sort this dictionary
 for var_name in DefaultParms.parm_dict.keys():
     print "%s =" % var_name, DefaultParms.parm_dict[var_name]
 
-#for cnt in range(0,len(DefaultParms.parm_varname)):
-#    print "%s =" % DefaultParms.parm_varname[cnt], DefaultParms.parm_value[cnt]
+print ""
+print "! Tracer count = %d" % DefaultParms.get_tracer_cnt()
