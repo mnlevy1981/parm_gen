@@ -48,13 +48,19 @@ class MARBL_defaults_class(object):
             # If inputfile == None then the open will result in TypeError
             pass
         except:
-            _abort("ERROR: input_file '%f' was not found")
+            _abort("ERROR: input_file '%s' was not found" % input_file)
 
         # 5. Use an ordered dictionary for keeping variable, value pairs
         self.parm_dict = OrderedDict()
         for cat_name in self.get_category_names():
             for var_name in self.get_variable_names(cat_name):
                 self._process_variable_value(cat_name, var_name)
+
+        if (self._input_dict):
+            print "ERROR: Did not fully parse input file:"
+            for varname in self._input_dict.keys():
+                print "Could not handle variable %s" % varname
+            _abort()
 
     ##################
     # PUBLIC METHODS #
@@ -195,6 +201,9 @@ def _get_var_value(varname, var_dict, provided_keys, input_dict):
     if varname in input_dict.keys():
         # Ignore ' and " from strings
         def_value = input_dict[varname].strip('"').strip("'")
+        # Remove from input file dictionary; if dictionary is not empty after processing
+        # all input file lines, then it included a bad variable in it
+        del input_dict[varname]
     else:
         # is default value a dictionary? If so, it depends on self._config_keyword
         # Otherwise we're interested in default value
@@ -222,6 +231,8 @@ def _get_var_value(varname, var_dict, provided_keys, input_dict):
         return '"%s"' % def_value
     if var_dict["datatype"] == "real" and isinstance(def_value, str):
         return "%20.15e" % eval(def_value)
+    if var_dict["datatype"] == "integer" and isinstance(def_value, str):
+        return int(def_value)
     return def_value
 
 ################################################################################
