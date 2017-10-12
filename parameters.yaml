@@ -10,7 +10,7 @@
 #
 # All variables need to provide the following metadata:
 # 1. longname: a description of the variable
-# 2. category: when writing parameters to the log, MARBL will group variables by category
+# 2. subcategory: when writing parameters to the log, MARBL will group variables by subcategory
 # 3. units: physical units (use "unitless" for pure numbers and "non-numeric" for strings / logicals)
 # 4. datatype: integer, real, logical, or string
 # 5. default_value: Value to use unless overwritten by the MARBL input file
@@ -43,7 +43,7 @@ _tracer_cnt : &TRACER_CNT
 general_parms :
    PFT_defaults :
       longname : Define how PFTs are initialized
-      category : config PFTs
+      subcategory : 1. config PFTs
       units : unitless
       datatype : string
       default_value : CESM2
@@ -64,109 +64,109 @@ general_parms :
       append_to_config_keywords : true
    ciso_on :
       longname : Control whether CISO tracer module is active
-      category : config flags
+      subcategory : 2. config flags
       units : unitless
       datatype : logical
       default_value : .false.
    lsource_sink :
       longname : Control which portions of code are executed (useful for debugging)
-      category : config flags
+      subcategory : 2. config flags
       units : unitless
       datatype : logical
       default_value : .true.
    ciso_lsource_sink :
       longname : Control which portions of the carbon isotope code are executed (useful for debugging)
-      category : config flags
+      subcategory : 2. config flags
       units : unitless
       datatype : logical
       default_value : .true.
    lecovars_full_depth_tavg :
       longname : Control whether base ecosystem variables are written full depth
-      category : config flags
+      subcategory : 2. config flags
       units : unitless
       datatype : logical
       default_value : .false.
    ciso_lecovars_full_depth_tavg :
       longname : Control whether carbon isotope variables are written full depth
-      category : config flags
+      subcategory : 2. config flags
       units : unitless
       datatype : logical
       default_value : .false.
    lflux_gas_o2 :
       longname : Control which portions of code are executed (useful for debugging)
-      category : config flags
+      subcategory : 2. config flags
       units : unitless
       datatype : logical
       default_value : .true.
    lflux_gas_co2 :
       longname : Control which portions of code are executed (useful for debugging)
-      category : config flags
+      subcategory : 2. config flags
       units : unitless
       datatype : logical
       default_value : .true.
    lcompute_nhx_surface_emis :
       longname : Control if NHx emissions are computed
-      category : config flags
+      subcategory : 2. config flags
       units : unitless
       datatype : logical
       default_value : .true.
    lvariable_PtoC :
       longname : Control if PtoC ratios in autotrophs vary
-      category : config flags
+      subcategory : 2. config flags
       units : unitless
       datatype : logical
       default_value : .true.
    ladjust_bury_coeff :
       longname : Control if bury coefficients are adjusted (rather than constant)
-      category : config flags
+      subcategory : 2. config flags
       units : unitless
       datatype : logical
       default_value : .false.
    init_bury_coeff_opt :
       longname : Source of initial burial coefficient
-      category : config strings
+      subcategory : 3. config strings
       units : unitless
       datatype : string
       default_value : nml
    parm_Fe_bioavail :
       longname : Fraction of Fe flux that is bioavailable
-      category : general parmeters
+      subcategory : 4. general parameters
       units : unitless
       datatype : real
       default_value : 1.0
    parm_o2_min :
       longname : Minimum O2 needed for production & consumption
-      category : general parmeters
+      subcategory : 4. general parameters
       units : nmol/cm^3
       datatype : real
       default_value : 5.0
    parm_o2_min_delta :
       longname : Width of min O2 range
-      category : general parmeters
+      subcategory : 4. general parameters
       units : nmol/cm^3
       datatype : real
       default_value : 5.0
    parm_kappa_nitrif_per_day :
       longname : Nitrification inverse time constant
-      category : general parmeters
+      subcategory : 4. general parameters
       units : 1/day
       datatype : real
       default_value : 0.06
    parm_nitrif_par_lim :
       longname : PAR limit for nitrification
-      category : general parameters
+      subcategory : 4. general parameters
       units : W/m^2
       datatype : real
       default_value : 1.0
    parm_labile_ratio :
       longname : Fraction of loss to DOC that routed directly to DIC
-      category : general parmeters
+      subcategory : 4. general parameters
       units : unitless
       datatype : real
       default_value : 0.94
    parm_init_POC_bury_coeff :
       longname : Initial scale factor for burial of POC, PON
-      category : general parameter
+      subcategory : 4. general parameters
       units : unitless
       datatype : real
       default_value : # default value is resolution dependent!
@@ -174,7 +174,7 @@ general_parms :
          grid = CESM_x3 : 5.0
    parm_init_POP_bury_coeff :
       longname : Initial scale factor for burial of POP
-      category : general parameter
+      subcategory : 4. general parameters
       units : unitless
       datatype : real
       default_value : # default value is resolution dependent!
@@ -182,7 +182,7 @@ general_parms :
          grid = CESM_x3 : 5.0
    parm_init_bSi_bury_coeff :
       longname : Initial scale factor for burial of bSi
-      category : general parameter
+      subcategory : 4. general parameters
       units : unitless
       datatype : real
       default_value : # default value is resolution dependent!
@@ -190,37 +190,37 @@ general_parms :
          grid = CESM_x3 : 1.1
    parm_Fe_scavenge_rate0 :
       longname : Scavenging base rate for Fe
-      category : general parameter
+      subcategory : 4. general parameters
       units : unitless
       datatype : real
       default_value : 15
    parm_Lig_scavenge_rate0 :
       longname : Scavenging base rate for bound ligand
-      category : general parameter
+      subcategory : 4. general parameters
       units : unitless
       datatype : real
       default_value : 0.015
    parm_FeLig_scavenge_rate0 :
       longname : Scavenging base rate for bound iron
-      category : general parameter
+      subcategory : 4. general parameters
       units : unitless
       datatype : real
       default_value : 1.3
    parm_Lig_degrade_rate0 :
       longname : Fe-binding ligand bacterial degradation base rate coefficient
-      category : general parameter
+      subcategory : 4. general parameters
       units : unitless
       datatype : real
       default_value : 0.000094
    parm_Fe_desorption_rate0 :
       longname : Desorption rate for scavenged Fe from particles
-      category : general parameter
+      subcategory : 4. general parameters
       units : unitless
       datatype : real
       default_value : 1e-6
    parm_f_prod_sp_CaCO3 :
       longname : Fraction of sp production as CaCO3 production
-      category : general parameter
+      subcategory : 4. general parameters
       units : unitless
       datatype : real
       default_value : # default value is resolution dependent!
@@ -228,37 +228,37 @@ general_parms :
          grid = CESM_x3 : 0.075
    parm_POC_diss :
       longname : Base POC dissipation length scale
-      category : general parameter
+      subcategory : 4. general parameters
       units : cm
       datatype : real
       default_value : 100e2
    parm_SiO2_diss :
       longname : Base SiO2 dissipation length scale
-      category : general parameter
+      subcategory : 4. general parameters
       units : cm
       datatype : real
       default_value : 770e2
    parm_CaCO3_diss :
       longname : Base CaCO3 dissipation length scale
-      category : general parameter
+      subcategory : 4. general parameters
       units : cm
       datatype : real
       default_value : 500e2
    parm_sed_denitrif_coeff :
       longname : Global scaling factor for sed_denitrif
-      category : general parameter
+      subcategory : 4. general parameters
       units : unitless
       datatype : real
       default_value : 1
    bury_coeff_rmean_timescale_years :
       longname : Running mean time scale for bury coefficients
-      category : general parameter
+      subcategory : 4. general parameters
       units : years
       datatype : real
       default_value : 10
    parm_scalelen_z :
       longname : Depths of prescribed scalelen values
-      category : Scale lengths
+      subcategory : 5. Scale lengths
       units : cm
       datatype : real
       _array_size : 4
@@ -269,7 +269,7 @@ general_parms :
                     - 1000.0e2
    parm_scalelen_vals :
       longname : Prescribed scalelen values
-      category : Scale lengths
+      subcategory : 5. Scale lengths
       units : unitless
       datatype : real
       _array_size : 4
@@ -280,19 +280,19 @@ general_parms :
                     - 5
    iron_frac_in_dust :
       longname : Fraction by weight of iron in dust
-      category : general parameter
+      subcategory : 4. general parameters
       units : unitless
       datatype : real
       default_value : 0.035e-2
    iron_frac_in_bc :
       longname : Fraction by weight of iron in black carbon
-      category : general parameter
+      subcategory : 4. general parameters
       units : unitless
       datatype : real
       default_value : 0.06
    caco3_bury_thres_opt :
       longname : Option of threshold of CaCO3 burial
-      category : general parameter
+      subcategory : 4. general parameters
       units : non-numeric
       datatype : string
       default_value : omega_calc
@@ -301,19 +301,19 @@ general_parms :
                    - omega_calc
    caco3_bury_thres_depth :
       longname : Threshold depth for CaCO3 burial when opt = 'fixed_depth'
-      category : general parameter
+      subcategory : 4. general parameters
       units : cm
       datatype : real
       default_value : 3000e2
    PON_bury_coeff :
       longname : Scale factor for burial of PON
-      category : general parameter
+      subcategory : 4. general parameters
       units : unitless
       datatype : real
       default_value : 0.5
    ciso_fract_factors :
       longname : Option for which biological fractionation calculation to use
-      category : general parameter
+      subcategory : 4. general parameters
       units : non-numeric
       datatype : string
       default_value : Rau
@@ -322,7 +322,7 @@ general_parms :
 PFT_counts :
    autotroph_cnt :
       longname : Number of autotroph classes
-      category : config PFTs
+      subcategory : 1. config PFTs
       units : unitless
       datatype : integer
       default_value :
@@ -332,7 +332,7 @@ PFT_counts :
       must set : PFT_defaults == 'user-specified'
    zooplankton_cnt :
       longname : Number of zooplankton classes
-      category : config PFTs
+      subcategory : 1. config PFTs
       units : unitless
       datatype : integer
       default_value :
@@ -340,7 +340,7 @@ PFT_counts :
          PFT_defaults = "CESM2" : 1
    max_grazer_prey_cnt :
       longname : Number of grazer prey classes
-      category : config PFTs
+      subcategory : 1. config PFTs
       units : unitless
       datatype : integer
       default_value :
@@ -350,7 +350,7 @@ PFT_counts :
 # Category 3: PFTs
 PFT_derived_types :
    autotrophs :
-      category : autotrophs
+      subcategory : 10. autotrophs
       _array_size : autotroph_cnt
       _is_allocatable : true
       datatype :
@@ -583,7 +583,7 @@ PFT_derived_types :
                autotrophs = "diat" : 0
                autotrophs = "diaz" : 0
    zooplankton :
-      category : zooplankton
+      subcategory : 11. zooplankton
       _array_size : zooplankton_cnt
       _is_allocatable : true
       datatype :
@@ -626,7 +626,7 @@ PFT_derived_types :
                default : 1e34
                zooplankton = "zoo" : 0.075
    grazing :
-      category : grazing
+      subcategory : 12. grazing
       _array_size :
                   - max_grazer_prey_cnt
                   - zooplankton_cnt
@@ -742,10 +742,11 @@ PFT_derived_types :
 #            datatype : integer
 #            default_value : 0
 
+# Category 4: tracer_dependent
 tracer_dependent :
    tracer_restore_vars :
       longname : Tracer names for tracers that are restored
-      category : tracer restoring
+      subcategory : 20. tracer restoring
       units : non-numeric
       datatype : string
       _array_size : *TRACER_CNT

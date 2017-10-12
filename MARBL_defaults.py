@@ -115,11 +115,43 @@ class MARBL_defaults_class(object):
 
     ################################################################################
 
+    def get_subcategory_names(self):
+        """ Returns a sorted list of subcategories in a specific category.
+            For now, the list is sorted naturally (so 10 appears after 9, not after 1).
+
+            Optional: only return variables in a specific subcategory
+        """
+        subcat_list = []
+        for cat_name in self._parms['_order']:
+            for var_name in _sort(self._parms[cat_name].keys()):
+                this_subcat = self._parms[cat_name][var_name]['subcategory']
+                if this_subcat not in subcat_list:
+                    subcat_list.append(this_subcat)
+        return _sort(subcat_list, sort_key=_natural_sort_key)
+
+    ################################################################################
+
     def get_variable_names(self, category_name):
         """ Returns a sorted list of variables in a specific category.
-            For now, variables are sorted alphabetically.
+            For now, the list is sorted alphabetically.
         """
         return _sort(self._parms[category_name].keys())
+
+    ################################################################################
+
+    def get_parm_dict_variable_names(self, subcategory):
+        """ Returns a sorted list of variables in a specific category
+            and subcategory, expanding variable names if they are arrays
+            or derived types
+        """
+        varlist = []
+        for cat_name in self._parms['_order']:
+            for var_name in _sort(self._parms[cat_name].keys()):
+                this_var = self._parms[cat_name][var_name]
+                if this_var['subcategory'] == subcategory:
+                    for parm_key in this_var['_list_of_parm_names']:
+                        varlist.append(parm_key)
+        return _sort(varlist, sort_key=_natural_sort_key)
 
     ################################################################################
 
@@ -136,9 +168,14 @@ class MARBL_defaults_class(object):
         """ For a given variable in a given category, add to the self.parm_dict dictionary
             * For derived types and arrays, multiple entries will be added to self.parm_dict
 
-            At this time, the only derived types in the YAML file are also arrays
+            Also introduce a new key to the variable dictionary, '_list_of_parm_names', that
+            is populated with a list of all the keys added to self.parm_dict for this variable
+            (just varname for scalars, but multiple keys for arrays and derived types)
+
+            NOTE: At this time, the only derived types in the YAML file are also arrays
         """
         this_var = self._parms[category_name][variable_name]
+        this_var['_list_of_parm_names'] = []
         # Some default values depend on variables from previous categories
         # So we make a local copy of self._provided_keys and append variables as necessary
         local_keys = list(self._provided_keys)
@@ -163,6 +200,7 @@ class MARBL_defaults_class(object):
                         if key[0] != '_':
                             derived_elem_name = elem_name + "%" + key
                             self.parm_dict[derived_elem_name] = _get_var_value(derived_elem_name, this_var["datatype"][key], local_keys, self._input_dict)
+                            this_var['_list_of_parm_names'].append(derived_elem_name)
                     if append_to_keys:
                         # Remove PFT-specific key
                         del local_keys[-1]
@@ -172,8 +210,10 @@ class MARBL_defaults_class(object):
                         self.parm_dict[elem_name] = var_value[n]
                     else:
                         self.parm_dict[elem_name] = var_value
+                    this_var['_list_of_parm_names'].append(elem_name)
         else: # not an array
             self.parm_dict[variable_name] = _get_var_value(variable_name, this_var, local_keys, self._input_dict)
+            this_var['_list_of_parm_names'].append(variable_name)
 
 ##########################
 # PRIVATE MODULE METHODS #
@@ -237,11 +277,21 @@ def _get_var_value(varname, var_dict, provided_keys, input_dict):
 
 ################################################################################
 
-def _sort(a_list, sort_key=lambda s: s.lower()):
+def _sort(list_in, sort_key=None):
     """ Sort a list; default is alphabetical (case-insensitive), but that
         can be overridden with the sort_key argument
     """
-    return sorted(a_list, key=sort_key)
+    if sort_key is None:
+        sort_key = lambda s: s.lower()
+    return sorted(list_in, key=sort_key)
+
+################################################################################
+
+def _natural_sort_key(string_):
+    """ From https://stackoverflow.com/questions/2545532/python-analog-of-natsort-function-sort-a-list-using-a-natural-order-algorithm/3033342#3033342
+    """
+    import re
+    return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
 
 ################################################################################
 
