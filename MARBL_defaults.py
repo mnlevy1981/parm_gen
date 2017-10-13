@@ -44,10 +44,8 @@ class MARBL_defaults_class(object):
                 print "Could not handle variable %s" % varname
             _abort()
 
-    ##################
-    # PUBLIC METHODS #
-    ##################
-
+    ################################################################################
+    #                             PUBLIC CLASS METHODS                             #
     ################################################################################
 
     def get_tracer_cnt(self):
@@ -128,11 +126,8 @@ class MARBL_defaults_class(object):
         return _sort(varlist, sort_key=_natural_sort_key)
 
     ################################################################################
-
-
-    ###################
-    # PRIVATE METHODS #
-    ###################
+    #                            PRIVATE CLASS METHODS                             #
+    ################################################################################
 
     # TODO: define _value_is_valid()
     #       i.  datatype match?
@@ -189,10 +184,8 @@ class MARBL_defaults_class(object):
             self.parm_dict[variable_name] = _get_var_value(variable_name, this_var, local_keys, self._input_dict)
             this_var['_list_of_parm_names'].append(variable_name)
 
-##########################
-# PRIVATE MODULE METHODS #
-##########################
-
+################################################################################
+#                            PRIVATE MODULE METHODS                            #
 ################################################################################
 
 def _abort(err_code=0):
