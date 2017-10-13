@@ -30,25 +30,7 @@ class MARBL_defaults_class(object):
             self._parms = yaml.safe_load(parmsfile)
 
         # 4. Read input file
-        #    (Currently not implemented)
-        self._input_dict = dict()
-        try:
-            f = open(input_file, "r")
-            for line in f:
-                if len(line.lstrip()) == 0:
-                    # ignore empty lines
-                    continue
-                if line.lstrip()[0] == '!':
-                    # Ignore comments in input file!
-                    continue
-                line_list = line.strip().split('=')
-                self._input_dict[line_list[0].strip()] = line_list[1].strip()
-            f.close()
-        except TypeError:
-            # If inputfile == None then the open will result in TypeError
-            pass
-        except:
-            _abort("ERROR: input_file '%s' was not found" % input_file)
+        self._input_dict = _parse_input_file(input_file)
 
         # 5. Use an ordered dictionary for keeping variable, value pairs
         self.parm_dict = OrderedDict()
@@ -65,14 +47,6 @@ class MARBL_defaults_class(object):
     ##################
     # PUBLIC METHODS #
     ##################
-
-    # TODO:
-    #       Parse an input file
-    #          i.   figure  out workflow (read YAML then over-write?)
-    #          ii.  things like PFT array sizes will be tricky!
-    #          iii. Thought: two dictionarys, self._parms (renamed self._yaml_parms) and self._input_parms
-    #                        Look in _input_parms first, if no key match then fallback to YAML?
-    #                        Or maybe combine YAML and inputfile during __init__?
 
     ################################################################################
 
@@ -244,6 +218,13 @@ def _get_var_value(varname, var_dict, provided_keys, input_dict):
         # Remove from input file dictionary; if dictionary is not empty after processing
         # all input file lines, then it included a bad variable in it
         del input_dict[varname]
+    # Note that if variable foo is an array, then foo = bar in the input file
+    # should be treated as foo(1) = bar
+    elif varname[-3:] == "(1)" and varname[:-3] in input_dict.keys():
+        def_value = input_dict[varname[:-3]].strip('"').strip("'")
+        # Remove from input file dictionary; if dictionary is not empty after processing
+        # all input file lines, then it included a bad variable in it
+        del input_dict[varname[:-3]]
     else:
         # is default value a dictionary? If so, it depends on self._config_keyword
         # Otherwise we're interested in default value
@@ -357,6 +338,39 @@ def _get_array_info(array_size_in, parm_dict):
     for i in range(0, _get_dim_size(array_size_in, parm_dict)):
         str_index.append("(%d)" % (i+1))
     return str_index
+
+################################################################################
+
+def _parse_input_file(input_file):
+    input_dict = dict()
+    try:
+        f = open(input_file, "r")
+        for line in f:
+            if len(line.lstrip()) == 0:
+                # ignore empty lines
+                continue
+            if line.lstrip()[0] == '!':
+                # Ignore comments in input file!
+                continue
+            line_list = line.strip().split('=')
+            var_name = line_list[0].strip()
+            value = line_list[1].strip()
+            val_array = value.split(',')
+            if len(val_array) > 1:
+                # Treat comma-delimited value as an array
+                for n, value in enumerate(val_array):
+                    suffix = "(%d)" % (n+1)
+                    input_dict[var_name+suffix] = value.strip()
+            else:
+                # Single value
+                input_dict[var_name] = value
+        f.close()
+    except TypeError:
+        # If inputfile == None then the open will result in TypeError
+        pass
+    except:
+        _abort("ERROR: input_file '%s' was not found" % input_file)
+    return input_dict
 
 ################################################################################
 
