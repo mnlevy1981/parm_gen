@@ -165,11 +165,28 @@ class MARBL_defaults_class(object):
                     if append_to_keys:
                         # Add key for specific PFT
                         local_keys.append('%s = "%s"' % (variable_name, self._parms['general_parms']['PFT_defaults']['_CESM2_PFT_keys'][variable_name][n]))
-                    for key in _sort(this_var["datatype"].keys()):
+
+                    for key in _sort_with_specific_suffix_first(this_var["datatype"].keys(),'_cnt'):
+                        this_component = this_var["datatype"][key]
                         if key[0] != '_':
                             derived_elem_name = elem_name + "%" + key
-                            self.parm_dict[derived_elem_name] = _get_var_value(derived_elem_name, this_var["datatype"][key], local_keys, self._input_dict)
-                            this_var['_list_of_parm_names'].append(derived_elem_name)
+                            # Is this key an array or a scalar?
+                            if ("_array_size" in this_component.keys()):
+                                try:
+                                    array_len = elem_name+"%"+this_component["_array_len_to_print"]
+                                except:
+                                    array_len = this_component["_array_size"]
+                                for m, elem_index2 in enumerate(_get_array_info(array_len, self.parm_dict)):
+                                    derived_elem_name2 = derived_elem_name + "(%d)" % (m+1)
+                                    var_value = _get_var_value(derived_elem_name2, this_component, local_keys, self._input_dict)
+                                    if isinstance(var_value, list):
+                                        self.parm_dict[derived_elem_name2] = var_value[n]
+                                    else:
+                                        self.parm_dict[derived_elem_name2] = var_value
+                                    this_var['_list_of_parm_names'].append(derived_elem_name2)
+                            else:
+                                self.parm_dict[derived_elem_name] = _get_var_value(derived_elem_name, this_component, local_keys, self._input_dict)
+                                this_var['_list_of_parm_names'].append(derived_elem_name)
                     if append_to_keys:
                         # Remove PFT-specific key
                         del local_keys[-1]
@@ -258,6 +275,27 @@ def _sort(list_in, sort_key=None):
     if sort_key is None:
         sort_key = lambda s: s.lower()
     return sorted(list_in, key=sort_key)
+
+################################################################################
+
+def _sort_with_specific_suffix_first(list_in, suffix=None, sort_key=None):
+    """ Sort, but make sure entries that end in a specified suffix are listed first
+    """
+
+    # 1. initialize empty list
+    list_out = []
+
+    # 2. Anything that ends in suffix gets appended to list_out first
+    if suffix is not None:
+        for list_entry in _sort(list_in, sort_key):
+            if list_entry.endswith(suffix):
+                list_out.append(list_entry)
+
+    # 3. Sort everything else
+    for list_entry in _sort(list_in, sort_key):
+        if list_entry not in list_out:
+            list_out.append(list_entry)
+    return list_out
 
 ################################################################################
 
@@ -366,4 +404,3 @@ def _parse_input_file(input_file):
     return input_dict
 
 ################################################################################
-

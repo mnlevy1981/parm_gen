@@ -30,6 +30,7 @@
 # 4. append_to_config_keywords:
 #
 
+# Order in which the categories are parsed
 _order : ["general_parms", "PFT_counts", "PFT_derived_types", "tracer_dependent"]
 
 # Tracer count
@@ -39,7 +40,10 @@ _tracer_cnt : &TRACER_CNT
       lvariable_PtoC = .false. : -3
       ciso_on = .true. : 14
 
-# Category 1: General Parameters
+################################################################################
+#                        Category 1: General Parameters                        #
+################################################################################
+
 general_parms :
    PFT_defaults :
       longname : Define how PFTs are initialized
@@ -318,7 +322,10 @@ general_parms :
       datatype : string
       default_value : Rau
 
-# Category 2: PFT_counts
+################################################################################
+#                            Category 2: PFT_counts                            #
+################################################################################
+
 PFT_counts :
    autotroph_cnt :
       longname : Number of autotroph classes
@@ -347,7 +354,10 @@ PFT_counts :
          default : 1
          PFT_defaults = "CESM2" : 3
 
-# Category 3: PFTs
+################################################################################
+#                         Category 3: PFT_derived_types                        #
+################################################################################
+
 PFT_derived_types :
    autotrophs :
       subcategory : 10. autotrophs
@@ -725,6 +735,7 @@ PFT_derived_types :
                grazing = "diaz_zoo" : 0.12
          auto_ind :
             _array_size : autotroph_cnt
+            _array_len_to_print : auto_ind_cnt
             _is_allocatable : true
             longname : Indices of autotrophs being grazed
             units : unitless
@@ -734,15 +745,19 @@ PFT_derived_types :
                grazing = "sp_zoo" : 1 # index where autotroph_name = sp
                grazing = "diat_zoo" : 2 # index where autotroph_name = diat
                grazing = "diaz_zoo" : 3 # index where autotroph_name = diaz
-#         zoo_ind :
-#            _array_size : zooplankton_cnt
-#            _is_allocatable : true
-#            longname : Indices of zooplankton being grazed
-#            units : unitless
-#            datatype : integer
-#            default_value : 0
+         zoo_ind :
+            _array_size : zooplankton_cnt
+            _array_len_to_print : zoo_ind_cnt
+            _is_allocatable : true
+            longname : Indices of zooplankton being grazed
+            units : unitless
+            datatype : integer
+            default_value : 0
 
-# Category 4: tracer_dependent
+################################################################################
+#                         Category 4: tracer_dependent                         #
+################################################################################
+
 tracer_dependent :
    tracer_restore_vars :
       longname : Tracer names for tracers that are restored
