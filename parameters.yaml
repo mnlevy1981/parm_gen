@@ -31,7 +31,11 @@
 #
 
 # Order in which the categories are parsed
-_order : ["general_parms", "PFT_counts", "PFT_derived_types", "tracer_dependent"]
+_order :
+       - general_parms
+       - PFT_counts
+       - PFT_derived_types
+       - tracer_dependent
 
 # Tracer count
 _tracer_cnt : &TRACER_CNT

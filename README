@@ -1,0 +1,62 @@
+Outline of class
+
+Objects
+-------
+1. dictionary as pulled from YAML
+   -- PRIVATE
+2. list (or dictionary) of configuration keywords for variables with multiple
+   possible default values
+   -- PRIVATE
+3. dictionary of varname / value pairs from input file
+4. [Ordered] dictionary for varname / value pair (this_dict['varname'] = value
+   -- PUBLIC
+   -- varname should be what is seen in the input file (i.e. var_array(1) = val1)
+
+Methods
+-------
+
+1. Constructor
+   - INTENT(IN): YAML file name, input file name (or None), anything that needs
+                 to be stored in object (2)
+   i.   Set up object (2)
+   ii.  Read YAML into object (1)
+   iii. If present, read input file into object (3)
+   iv.  Combine objects (1) and (3) into object (4)
+       -- order matters! use category / subcategory / natural sorting
+
+2. Get category names
+   - PUBLIC
+   - INTENT(IN): None
+   - RETURN: the list in _order key of YAML file
+   - consistency checks:
+     i.   All keys in _order should also be in the YAML
+     ii.  All keys in the YAML that don't begin with _ should be in _order
+     iii. No duplicates in _order
+
+3. Get subcategory names
+   - PUBLIC
+   - INTENT(IN): category name
+   - RETURN: list of all subcategories in provided category
+
+4. Get YAML variable names
+   - PUBLIC
+   - INTENT(IN): category name
+   - RETURN: list of all variables in provided category
+   - NOTE: do not expand arrays (return "arr" rather than "arr(1), arr(2), ...")
+
+5. Get all variable names
+   - PUBLIC
+   - INTENT(IN): subcategory name
+   - RETURN: list of keys for Object (4) that are variables in provided subcategory
+   - NOTES: make subcategory optional? Could just return a full list?
+            optional sort key argument?
+
+6. Process variable values
+   - PRIVATE
+   - INTENT(IN): category name, variable name
+   - RETURN: None
+   - PURPOSE: Populate Object (4) based on contents of (1) and (3)
+   i.   Arrays need to be expanded
+   ii.  Derived types need to be expanded
+   iii. Some derived types contain arrays that need to be expanded
+   - REALLY WANT TO CLEAN THIS ROUTINE UP!
