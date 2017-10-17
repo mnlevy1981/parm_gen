@@ -372,21 +372,43 @@ def _get_array_info(array_size_in, parm_dict):
 
 ################################################################################
 
+def _string_to_substring(str_in, separator):
+    """ Basically the python native split() function, but ignore separator that
+        is inside quotes. So (using separator = ',')
+            'abc, def, gh' -> ['abc', 'def', 'gh']
+        but
+            'abc,"def, gh"' -> ['abc', '"def, gh"']
+            "abc,'def, gh'" -> ['abc', '"def, gh"']
+    """
+
+    import re
+    re_separator = separator+"(?=(?:[^\"\']|[\"|\'][^\"\']*[\"|\'])*$)"
+    return re.split(re_separator, str_in)
+
+################################################################################
+
 def _parse_input_file(input_file):
+    """ 1. Read an input file; ignore blank lines and non-quoted Fortran comments.
+        2. Turn lines of the form
+              variable = value
+           Into input_dict['variable'] = value
+        3. Return input_dict
+    """
     input_dict = dict()
     try:
         f = open(input_file, "r")
         for line in f:
-            if len(line.lstrip()) == 0:
-                # ignore empty lines
+            # Ignore comments in input file!
+            line_loc = _string_to_substring(line, '!')[0]
+
+            # ignore empty lines
+            if len(line_loc.lstrip()) == 0:
                 continue
-            if line.lstrip()[0] == '!':
-                # Ignore comments in input file!
-                continue
-            line_list = line.strip().split('=')
+
+            line_list = line_loc.strip().split('=')
             var_name = line_list[0].strip()
             value = line_list[1].strip()
-            val_array = value.split(',')
+            val_array = _string_to_substring(value, ',')
             if len(val_array) > 1:
                 # Treat comma-delimited value as an array
                 for n, value in enumerate(val_array):
