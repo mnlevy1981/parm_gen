@@ -60,3 +60,48 @@ Methods
    ii.  Derived types need to be expanded
    iii. Some derived types contain arrays that need to be expanded
    - REALLY WANT TO CLEAN THIS ROUTINE UP!
+
+Module Functions / Subroutines
+------------------------------
+
+1. Abort
+   - PRIVATE
+   - Clean wrapper to sys.exit()
+
+2. Get variable value
+   - PRIVATE
+   - If variable is in input file dict, return its value; otherwise return YAML value
+   - Requires variable to be defined in YAML
+
+3. Sort
+   - PRIVATE
+   - Wrapper for sorting lists, default is alphabetical but can take any key
+
+4. Sort with specific suffix first
+   - PRIVATE
+   - In one case, we need to ensure that auto_ind_cnt and zoo_ind_cnt appear before auto_ind and zoo_ind
+
+5. Natural Sort Key
+   - PRIVATE
+   - Sorts numbers in numeric order, so "word10" comes after "word9", not "word1"
+   - Use as a key for Function (3)
+
+6. Add increments
+   - PRIVATE
+   - Some values (such as tracer count) need to be adjusted depending on parameter values
+
+7. Get dimension size
+   - PRIVATE
+   - Parses the "_array_size" key from YAML (can be integer value or refer to other YAML variable)
+
+8. Get array info
+   - PRIVATE
+   - For arrays, return a list containing all the array indices, e.g. ["(1)", "(2)", ... ] for
+     1D arrays or ["(1,1)", "(2,1)", ... ] for 2D arrays
+
+9. Parse input file
+   - PRIVATE
+   - Read an input file line by line, return dictionary for each "varname = value" pair
+   - Needs to recognize arrays, so "varname = 10, 20" -> "varname(1) = 10", "varname(2) = 20"
+   - Ignore blank lines
+   - Ignore comments (check to see if they are inside a string or not, though)
