@@ -99,7 +99,11 @@ Module Functions / Subroutines
    - For arrays, return a list containing all the array indices, e.g. ["(1)", "(2)", ... ] for
      1D arrays or ["(1,1)", "(2,1)", ... ] for 2D arrays
 
-9. Parse input file
+9. String to Substring
+   - PRIVATE
+   - str.split(), unless the delimiter is inside quotes
+
+10. Parse input file
    - PRIVATE
    - Read an input file line by line, return dictionary for each "varname = value" pair
    - Needs to recognize arrays, so "varname = 10, 20" -> "varname(1) = 10", "varname(2) = 20"
