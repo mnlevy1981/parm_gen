@@ -379,6 +379,8 @@ def _string_to_substring(str_in, separator):
         but
             'abc,"def, gh"' -> ['abc', '"def, gh"']
             "abc,'def, gh'" -> ['abc', '"def, gh"']
+
+        Note: unexpected results if str_in is missing a closing ' or "
     """
 
     import re
