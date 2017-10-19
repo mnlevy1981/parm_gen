@@ -149,71 +149,76 @@ class MARBL_defaults_class(object):
     #       ii. optional valid_value key check
 
     def _process_variable_value(self, category_name, variable_name):
-        """ For a given variable in a given category, add to the self.parm_dict dictionary
-            * For derived types and arrays, multiple entries will be added to self.parm_dict
-
-            Also introduce a new key to the variable dictionary, '_list_of_parm_names', that
-            is populated with a list of all the keys added to self.parm_dict for this variable
-            (just varname for scalars, but multiple keys for arrays and derived types)
+        """ For a given variable in a given category, call _update_parm_dict()
+            * If variable is a derived type, _update_parm_dict() needs to be called element by element
 
             NOTE: At this time, the only derived types in the YAML file are also arrays
         """
         this_var = self._parms[category_name][variable_name]
+
         if not isinstance(this_var["datatype"], dict):
             this_var['_list_of_parm_names'] = []
+            self._update_parm_dict(this_var, variable_name)
+            return
 
-        # Is the variable an array? If so, treat each entry separately
+        # Process derived type!
+        append_to_keys = ('PFT_defaults = "CESM2"' in self._provided_keys) and (category_name == "PFT_derived_types")
+        # Is the derived type an array? If so, treat each entry separately
         if ("_array_size" in this_var.keys()):
-
             for n, elem_index in enumerate(_get_array_info(this_var["_array_size"], self.parm_dict)):
                 # Append "(index)" to variable name
-                elem_name = "%s%s" % (variable_name, elem_index)
+                base_name = "%s%s%%" % (variable_name, elem_index)
 
-                # Is this an array of a derived type? If so, treat each element separately
-                if isinstance(this_var["datatype"], dict):
-                    append_to_keys = ('PFT_defaults = "CESM2"' in self._provided_keys) and (category_name == "PFT_derived_types")
-                    if append_to_keys:
-                        # Add key for specific PFT
-                        self._provided_keys.append('%s = "%s"' % (variable_name, self._parms['general_parms']['PFT_defaults']['_CESM2_PFT_keys'][variable_name][n]))
+                if append_to_keys:
+                    # Add key for specific PFT
+                    self._provided_keys.append('%s = "%s"' % (variable_name, self._parms['general_parms']['PFT_defaults']['_CESM2_PFT_keys'][variable_name][n]))
 
-                    for key in _sort_with_specific_suffix_first(this_var["datatype"].keys(),'_cnt'):
+                for key in _sort_with_specific_suffix_first(this_var["datatype"].keys(),'_cnt'):
+                    if key[0] != '_':
+                        # Call _update_parm_dict() for each variable in derived type
                         this_component = this_var["datatype"][key]
-                        if key[0] != '_':
-                            try:
-                                this_component['_list_of_parm_names']
-                            except:
-                                this_component['_list_of_parm_names'] = []
-                            derived_elem_name = elem_name + "%" + key
-                            # Is this key an array or a scalar?
-                            if ("_array_size" in this_component.keys()):
-                                try:
-                                    array_len = elem_name+"%"+this_component["_array_len_to_print"]
-                                except:
-                                    array_len = this_component["_array_size"]
-                                for m, elem_index2 in enumerate(_get_array_info(array_len, self.parm_dict)):
-                                    derived_elem_name2 = derived_elem_name + "(%d)" % (m+1)
-                                    var_value = _get_var_value(derived_elem_name2, this_component, self._provided_keys, self._input_dict)
-                                    if isinstance(var_value, list):
-                                        self.parm_dict[derived_elem_name2] = var_value[n]
-                                    else:
-                                        self.parm_dict[derived_elem_name2] = var_value
-                                    this_component['_list_of_parm_names'].append(derived_elem_name2)
-                            else:
-                                self.parm_dict[derived_elem_name] = _get_var_value(derived_elem_name, this_component, self._provided_keys, self._input_dict)
-                                this_component['_list_of_parm_names'].append(derived_elem_name)
-                    if append_to_keys:
-                        # Remove PFT-specific key
-                        del self._provided_keys[-1]
-                else: # Not derived type
-                    var_value = _get_var_value(elem_name, this_var, self._provided_keys, self._input_dict)
-                    if (isinstance(var_value, list)):
-                        self.parm_dict[elem_name] = var_value[n]
-                    else:
-                        self.parm_dict[elem_name] = var_value
-                    this_var['_list_of_parm_names'].append(elem_name)
-        else: # not an array
-            self.parm_dict[variable_name] = _get_var_value(variable_name, this_var, self._provided_keys, self._input_dict)
-            this_var['_list_of_parm_names'].append(variable_name)
+                        try:
+                            this_component['_list_of_parm_names']
+                        except:
+                            this_component['_list_of_parm_names'] = []
+                        self._update_parm_dict(this_component, base_name+key, base_name)
+
+                if append_to_keys:
+                    # Remove PFT-specific key
+                    del self._provided_keys[-1]
+
+    ################################################################################
+
+    def _update_parm_dict(self, this_var, var_name, base_name=''):
+        """ For a given variable in a given category, add to the self.parm_dict dictionary
+            * For derived types, user passes in component as well as base_name ("variable_name%")
+            * For arrays, multiple entries will be added to self.parm_dict
+
+            Also introduce a new key to the variable dictionary, '_list_of_parm_names', that
+            is populated with a list of all the keys added to self.parm_dict for this variable
+            (just varname for scalars, but multiple keys for arrays)
+        """
+        if ("_array_size" in this_var.keys()):
+            # Get length of array
+            try:
+                array_len = this_var["_array_len_to_print"]
+            except:
+                array_len = this_var["_array_size"]
+
+            # For each element, get value from either input file or YAML
+            for n, elem_index in enumerate(_get_array_info(array_len, self.parm_dict, base_name)):
+                full_name = var_name + elem_index
+                var_value = _get_var_value(full_name, this_var, self._provided_keys, self._input_dict)
+                if isinstance(var_value, list):
+                    self.parm_dict[full_name] = var_value[n]
+                else:
+                    self.parm_dict[full_name] = var_value
+                this_var['_list_of_parm_names'].append(full_name)
+
+        else:
+            # get value from either input file or YAML
+            self.parm_dict[var_name] = _get_var_value(var_name, this_var, self._provided_keys, self._input_dict)
+            this_var['_list_of_parm_names'].append(var_name)
 
 ################################################################################
 #                            PRIVATE MODULE METHODS                            #
@@ -336,7 +341,7 @@ def _add_increments(increments, parm_dict):
 
 ################################################################################
 
-def _get_dim_size(dim_in, parm_dict):
+def _get_dim_size(dim_in, parm_dict, dict_prefix=''):
     """ If dim_in is an integer, it is the dimension size. Otherwise we need to
         look up the dim_in key in parm_dict.
     """
@@ -349,9 +354,15 @@ def _get_dim_size(dim_in, parm_dict):
         check_increment = False
 
     if isinstance(dim_start, int):
+        # If dim_start is an integer, use it as dim_out
         dim_out = dim_start
     else:
-        dim_out = parm_dict[dim_start]
+        # Otherwise, dim_start must refer to a variable that could be
+        # in the dictionary with or without the prefix
+        try:
+            dim_out = parm_dict[dict_prefix+dim_start]
+        except:
+            dim_out = parm_dict[dim_start]
 
     if check_increment:
         dim_out = dim_out + _add_increments(dim_in['increments'], parm_dict)
@@ -359,10 +370,11 @@ def _get_dim_size(dim_in, parm_dict):
     return dim_out
 ################################################################################
 
-def _get_array_info(array_size_in, parm_dict):
+def _get_array_info(array_size_in, parm_dict, dict_prefix=''):
     """ Return a list of the proper formatting for array elements, e.g.
             ['(1)', '(2)'] for 1D array or
             ['(1,1)', '(2,1)'] for 2D array
+        If array_size_in is not an integer, check to see if it is in parm_dict
     """
 
     # List to be returned:
@@ -377,13 +389,13 @@ def _get_array_info(array_size_in, parm_dict):
             print "ERROR: _get_array_info() only supports 1D and 2D arrays"
             _abort()
 
-        for i in range(0, _get_dim_size(array_size_in[0], parm_dict)):
-            for j in range(0, _get_dim_size(array_size_in[1], parm_dict)):
+        for i in range(0, _get_dim_size(array_size_in[0], parm_dict, dict_prefix)):
+            for j in range(0, _get_dim_size(array_size_in[1], parm_dict, dict_prefix)):
                 str_index.append("(%d,%d)" % (i+1,j+1))
         return str_index
 
     # How many elements? May be an integer or an entry in self.parm_dict
-    for i in range(0, _get_dim_size(array_size_in, parm_dict)):
+    for i in range(0, _get_dim_size(array_size_in, parm_dict, dict_prefix)):
         str_index.append("(%d)" % (i+1))
     return str_index
 
