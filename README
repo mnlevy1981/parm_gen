@@ -38,7 +38,7 @@ Methods
    - INTENT(IN): category name
    - RETURN: list of all subcategories in provided category
 
-4. Get YAML variable names
+4. Get YAML variable names in a specific category
    - PUBLIC
    - INTENT(IN): category name
    - RETURN: list of all variables in provided category
@@ -75,7 +75,7 @@ Module Functions / Subroutines
 
 3. Sort
    - PRIVATE
-   - Wrapper for sorting lists, default is alphabetical but can take any key
+   - Wrapper for sorting lists, default is case-insensitive alphabetical but can take any key
 
 4. Sort with specific suffix first
    - PRIVATE
@@ -108,4 +108,4 @@ Module Functions / Subroutines
    - Read an input file line by line, return dictionary for each "varname = value" pair
    - Needs to recognize arrays, so "varname = 10, 20" -> "varname(1) = 10", "varname(2) = 20"
    - Ignore blank lines
-   - Ignore comments (check to see if they are inside a string or not, though)
+   - Ignore comments

@@ -286,18 +286,6 @@ general_parms :
                     - 2.2
                     - 4
                     - 5
-   iron_frac_in_dust :
-      longname : Fraction by weight of iron in dust
-      subcategory : 4. general parameters
-      units : unitless
-      datatype : real
-      default_value : 0.035e-2
-   iron_frac_in_bc :
-      longname : Fraction by weight of iron in black carbon
-      subcategory : 4. general parameters
-      units : unitless
-      datatype : real
-      default_value : 0.06
    caco3_bury_thres_opt :
       longname : Option of threshold of CaCO3 burial
       subcategory : 4. general parameters
