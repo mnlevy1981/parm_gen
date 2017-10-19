@@ -96,18 +96,25 @@ class MARBL_defaults_class(object):
         subcat_list = []
         for cat_name in self._parms['_order']:
             for var_name in _sort(self._parms[cat_name].keys()):
-                this_subcat = self._parms[cat_name][var_name]['subcategory']
-                if this_subcat not in subcat_list:
-                    subcat_list.append(this_subcat)
+                if isinstance(self._parms[cat_name][var_name]['datatype'], dict):
+                    for subvar_name in _sort(self._parms[cat_name][var_name]['datatype'].keys()):
+                        if subvar_name[0] != '_':
+                            this_subcat = self._parms[cat_name][var_name]['datatype'][subvar_name]['subcategory']
+                            if this_subcat not in subcat_list:
+                                subcat_list.append(this_subcat)
+                else:
+                    this_subcat = self._parms[cat_name][var_name]['subcategory']
+                    if this_subcat not in subcat_list:
+                        subcat_list.append(this_subcat)
         return _sort(subcat_list, sort_key=_natural_sort_key)
 
     ################################################################################
 
-    def get_variable_names(self, category_name):
+    def get_variable_names(self, category_name, sort_key=None):
         """ Returns a sorted list of variables in a specific category.
             For now, the list is sorted alphabetically.
         """
-        return _sort(self._parms[category_name].keys())
+        return _sort(self._parms[category_name].keys(), sort_key)
 
     ################################################################################
 
@@ -119,10 +126,18 @@ class MARBL_defaults_class(object):
         varlist = []
         for cat_name in self._parms['_order']:
             for var_name in _sort(self._parms[cat_name].keys()):
-                this_var = self._parms[cat_name][var_name]
-                if this_var['subcategory'] == subcategory:
-                    for parm_key in this_var['_list_of_parm_names']:
-                        varlist.append(parm_key)
+                if isinstance(self._parms[cat_name][var_name]['datatype'], dict):
+                    for subvar_name in _sort(self._parms[cat_name][var_name]['datatype'].keys()):
+                        if subvar_name[0] != '_':
+                            this_var = self._parms[cat_name][var_name]['datatype'][subvar_name]
+                            if this_var['subcategory'] == subcategory:
+                                for parm_key in this_var['_list_of_parm_names']:
+                                    varlist.append(parm_key)
+                else:
+                    this_var = self._parms[cat_name][var_name]
+                    if this_var['subcategory'] == subcategory:
+                        for parm_key in this_var['_list_of_parm_names']:
+                            varlist.append(parm_key)
         return _sort(varlist, sort_key=_natural_sort_key)
 
     ################################################################################
@@ -144,12 +159,8 @@ class MARBL_defaults_class(object):
             NOTE: At this time, the only derived types in the YAML file are also arrays
         """
         this_var = self._parms[category_name][variable_name]
-        this_var['_list_of_parm_names'] = []
-        # Some default values depend on variables from previous categories
-        # So we make a local copy of self._provided_keys and append variables as necessary
-        local_keys = list(self._provided_keys)
-        if category_name == "PFT_counts":
-            local_keys.append("PFT_defaults = %s" % self.parm_dict['PFT_defaults'])
+        if not isinstance(this_var["datatype"], dict):
+            this_var['_list_of_parm_names'] = []
 
         # Is the variable an array? If so, treat each entry separately
         if ("_array_size" in this_var.keys()):
@@ -160,15 +171,18 @@ class MARBL_defaults_class(object):
 
                 # Is this an array of a derived type? If so, treat each element separately
                 if isinstance(this_var["datatype"], dict):
-                    append_to_keys = (category_name == "PFT_derived_types" and
-                                      self.parm_dict['PFT_defaults'].strip('\"') == "CESM2")
+                    append_to_keys = ('PFT_defaults = "CESM2"' in self._provided_keys) and (category_name == "PFT_derived_types")
                     if append_to_keys:
                         # Add key for specific PFT
-                        local_keys.append('%s = "%s"' % (variable_name, self._parms['general_parms']['PFT_defaults']['_CESM2_PFT_keys'][variable_name][n]))
+                        self._provided_keys.append('%s = "%s"' % (variable_name, self._parms['general_parms']['PFT_defaults']['_CESM2_PFT_keys'][variable_name][n]))
 
                     for key in _sort_with_specific_suffix_first(this_var["datatype"].keys(),'_cnt'):
                         this_component = this_var["datatype"][key]
                         if key[0] != '_':
+                            try:
+                                this_component['_list_of_parm_names']
+                            except:
+                                this_component['_list_of_parm_names'] = []
                             derived_elem_name = elem_name + "%" + key
                             # Is this key an array or a scalar?
                             if ("_array_size" in this_component.keys()):
@@ -178,27 +192,27 @@ class MARBL_defaults_class(object):
                                     array_len = this_component["_array_size"]
                                 for m, elem_index2 in enumerate(_get_array_info(array_len, self.parm_dict)):
                                     derived_elem_name2 = derived_elem_name + "(%d)" % (m+1)
-                                    var_value = _get_var_value(derived_elem_name2, this_component, local_keys, self._input_dict)
+                                    var_value = _get_var_value(derived_elem_name2, this_component, self._provided_keys, self._input_dict)
                                     if isinstance(var_value, list):
                                         self.parm_dict[derived_elem_name2] = var_value[n]
                                     else:
                                         self.parm_dict[derived_elem_name2] = var_value
-                                    this_var['_list_of_parm_names'].append(derived_elem_name2)
+                                    this_component['_list_of_parm_names'].append(derived_elem_name2)
                             else:
-                                self.parm_dict[derived_elem_name] = _get_var_value(derived_elem_name, this_component, local_keys, self._input_dict)
-                                this_var['_list_of_parm_names'].append(derived_elem_name)
+                                self.parm_dict[derived_elem_name] = _get_var_value(derived_elem_name, this_component, self._provided_keys, self._input_dict)
+                                this_component['_list_of_parm_names'].append(derived_elem_name)
                     if append_to_keys:
                         # Remove PFT-specific key
-                        del local_keys[-1]
+                        del self._provided_keys[-1]
                 else: # Not derived type
-                    var_value = _get_var_value(elem_name, this_var, local_keys, self._input_dict)
+                    var_value = _get_var_value(elem_name, this_var, self._provided_keys, self._input_dict)
                     if (isinstance(var_value, list)):
                         self.parm_dict[elem_name] = var_value[n]
                     else:
                         self.parm_dict[elem_name] = var_value
                     this_var['_list_of_parm_names'].append(elem_name)
         else: # not an array
-            self.parm_dict[variable_name] = _get_var_value(variable_name, this_var, local_keys, self._input_dict)
+            self.parm_dict[variable_name] = _get_var_value(variable_name, this_var, self._provided_keys, self._input_dict)
             this_var['_list_of_parm_names'].append(variable_name)
 
 ################################################################################
@@ -259,6 +273,9 @@ def _get_var_value(varname, var_dict, provided_keys, input_dict):
 
     # if variable is a string, put quotes around the default value
     if var_dict["datatype"] == "string":
+        if "_append_to_config_keywords" in var_dict.keys():
+            if var_dict["_append_to_config_keywords"]:
+                provided_keys.append('%s = "%s"' % (varname, def_value))
         return '"%s"' % def_value
     if var_dict["datatype"] == "real" and isinstance(def_value, str):
         return "%20.15e" % eval(def_value)
