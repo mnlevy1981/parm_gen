@@ -53,13 +53,16 @@ Methods
 
 6. Process variable values
    - PRIVATE
+   - PURPOSE: determine if variable is derived type or not, then call _update_parm_dict()
    - INTENT(IN): category name, variable name
    - RETURN: None
+
+7. Update parm_dict
+   - PRIVATE
    - PURPOSE: Populate Object (4) based on contents of (1) and (3)
-   i.   Arrays need to be expanded
-   ii.  Derived types need to be expanded
-   iii. Some derived types contain arrays that need to be expanded
-   - REALLY WANT TO CLEAN THIS ROUTINE UP!
+              Arrays need to be expanded
+   - INTENT(IN): variable dictionary, variable name, base name if element of derived type
+   - RETURN: None
 
 Module Functions / Subroutines
 ------------------------------
