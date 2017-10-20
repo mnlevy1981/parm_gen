@@ -162,7 +162,10 @@ class MARBL_defaults_class(object):
             return
 
         # Process derived type!
-        append_to_keys = ('PFT_defaults = "CESM2"' in self._provided_keys) and (category_name == "PFT_derived_types")
+        append_to_keys = (('PFT_defaults = "CESM2"' in self._provided_keys) and
+                          (category_name == "PFT_derived_types"))
+        if append_to_keys:
+            PFT_keys = self._parms['general_parms']['PFT_defaults']['_CESM2_PFT_keys'][variable_name]
         # Is the derived type an array? If so, treat each entry separately
         if ("_array_size" in this_var.keys()):
             for n, elem_index in enumerate(_get_array_info(this_var["_array_size"], self.parm_dict)):
@@ -171,7 +174,7 @@ class MARBL_defaults_class(object):
 
                 if append_to_keys:
                     # Add key for specific PFT
-                    self._provided_keys.append('%s = "%s"' % (variable_name, self._parms['general_parms']['PFT_defaults']['_CESM2_PFT_keys'][variable_name][n]))
+                    self._provided_keys.append('%s = "%s"' % (variable_name, PFT_keys[n]))
 
                 for key in _sort_with_specific_suffix_first(this_var["datatype"].keys(),'_cnt'):
                     if key[0] != '_':
