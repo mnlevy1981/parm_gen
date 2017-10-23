@@ -25,7 +25,10 @@ class MARBL_defaults_class(object):
         self._provided_keys.append("grid = " + self._config_keyword['grid'])
 
         # 3. Read YAML file
-        import yaml
+        try:
+            import yaml
+        except:
+            _abort("ERROR: Can not find PyYAML library")
         with open(yaml_file) as parmsfile:
             self._parms = yaml.safe_load(parmsfile)
 
