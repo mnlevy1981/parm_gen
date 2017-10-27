@@ -30,8 +30,7 @@ args = parser.parse_args()
 ##################
 
 import logging
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(levelname)s (%(funcName)s): %(message)s', level=logging.DEBUG)
 
 ###################################
 # Initialize class from YAML file #
@@ -40,7 +39,7 @@ logger = logging.getLogger(__name__)
 from sys import path
 path.insert(0, args.lib_dir)
 from MARBL_defaults import MARBL_defaults_class
-DefaultParms = MARBL_defaults_class(args.yaml_file, args.grid, args.input_file, logger)
+DefaultParms = MARBL_defaults_class(args.yaml_file, args.grid, args.input_file)#, logger)
 
 ################
 # BEGIN SCRIPT #

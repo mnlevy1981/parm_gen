@@ -1,3 +1,5 @@
+import logging
+
 class MARBL_defaults_class(object):
     """ This class contains methods to allow python to interact with the YAML file that
         defines the MARBL parameters and sets default values.
@@ -10,13 +12,13 @@ class MARBL_defaults_class(object):
     # CONSTRUCTOR #
     ###############
 
-    def __init__(self, yaml_file, grid, input_file, logger):
+    def __init__(self, yaml_file, grid, input_file):
         """ Class constructor: set up a dictionary of config keywords for when multiple
             default values are provided, and then read the YAML file.
         """
         from collections import OrderedDict
 
-        self._log = logger
+        logger = logging.getLogger(__name__)
 
         # 1. Set up dictionary of config keywords
         self._config_keyword = OrderedDict()
@@ -30,22 +32,22 @@ class MARBL_defaults_class(object):
         try:
             import yaml
         except:
-            self._log.error("Can not find PyYAML library")
+            logger.error("Can not find PyYAML library")
             _abort(1)
         try:
             with open(yaml_file) as parmsfile:
                 self._parms = yaml.safe_load(parmsfile)
         except:
-            self._log.error("Can not find %s" % yaml_file)
+            logger.error("Can not find %s" % yaml_file)
             _abort(1)
 
         # 4 Make sure YAML file adheres to MARBL parameter file schema
-        if _invalid_parms_file(self._parms, self._log):
-            self._log.error("%s is not a valid MARBL parameter file" % yaml_file)
+        if _invalid_parms_file(self._parms):
+            logger.error("%s is not a valid MARBL parameter file" % yaml_file)
             _abort(1)
 
         # 5. Read input file
-        self._input_dict = _parse_input_file(input_file, self._log)
+        self._input_dict = _parse_input_file(input_file)
 
         # 6. Use an ordered dictionary for keeping variable, value pairs
         self.parm_dict = OrderedDict()
@@ -57,7 +59,7 @@ class MARBL_defaults_class(object):
             message = "Did not fully parse input file:"
             for varname in self._input_dict.keys():
                 message = message + "\n     * Variable %s not found in YAML" % varname
-            self._log.error(message)
+            logger.error(message)
             _abort(1)
 
     ################################################################################
@@ -251,7 +253,7 @@ def _abort(err_code=0):
 
 ################################################################################
 
-def _invalid_parms_file(YAMLdict, logger):
+def _invalid_parms_file(YAMLdict):
     """ Read a YAML file, make sure it conforms to MARBL parameter file standards
         1. _order is a top-level key
         2. Everything listed in _order is a top-level key
@@ -266,6 +268,7 @@ def _invalid_parms_file(YAMLdict, logger):
     """
 
     invalid_file = False
+    logger = logging.getLogger(__name__)
 
     # 1. _order is a top-level key
     if "_order" not in YAMLdict.keys():
@@ -295,21 +298,21 @@ def _invalid_parms_file(YAMLdict, logger):
                     # 5. If datatype is not a dictionary, variable dictionary keys should include
                     #    longname, subcategory, units, datatype, default_value
                     #    Also, if default_value is a dictionary, that dictionary needs to contain "default" key
-                    if not _valid_variable_dict(YAMLdict[cat_name][var_name], var_name, logger):
+                    if not _valid_variable_dict(YAMLdict[cat_name][var_name], var_name):
                         invalid_file = True
                 else:
                     # 6. If datatype is a dictionary, all keys in the datatype are variables per (5)
                     for subvar_name in YAMLdict[cat_name][var_name]["datatype"].keys():
                         if subvar_name[0] != '_':
                             if not _valid_variable_dict(YAMLdict[cat_name][var_name]["datatype"][subvar_name],
-                                                        "%s%%%s"  % (var_name, subvar_name), logger):
+                                                        "%s%%%s"  % (var_name, subvar_name)):
                                 invalid_file = True
 
     return invalid_file
 
 ################################################################################
 
-def _valid_variable_dict(var_dict, var_name, logger):
+def _valid_variable_dict(var_dict, var_name):
     """ Return False if dictionary does not contain any of the following:
         * longname
         * subcategory
@@ -318,6 +321,7 @@ def _valid_variable_dict(var_dict, var_name, logger):
         * default_value
     """
 
+    logger = logging.getLogger(__name__)
     for key_check in ["longname", "subcategory", "units", "datatype", "default_value"]:
         if key_check not in var_dict.keys():
             message = "Variable %s is not well-defined in YAML" % var_name
@@ -517,7 +521,7 @@ def _string_to_substring(str_in, separator):
 
 ################################################################################
 
-def _parse_input_file(input_file, logger):
+def _parse_input_file(input_file):
     """ 1. Read an input file; ignore blank lines and non-quoted Fortran comments.
         2. Turn lines of the form
               variable = value
@@ -525,6 +529,8 @@ def _parse_input_file(input_file, logger):
         3. Return input_dict
     """
     input_dict = dict()
+    logger = logging.getLogger(__name__)
+
     try:
         f = open(input_file, "r")
         for line in f:
