@@ -273,7 +273,7 @@ def _invalid_parms_file(YAMLdict):
     # 1. _order is a top-level key
     if "_order" not in YAMLdict.keys():
         logger.error("Can not find _order key")
-        invalid_file = True
+        return True
 
     # 2. Everything listed in _order is a top-level key
     for cat_name in YAMLdict["_order"]:
@@ -289,10 +289,12 @@ def _invalid_parms_file(YAMLdict):
                 invalid_file = True
 
             # 4. All second-level dictionaries (variable names) contain datatype key
+            #    If the variable is of a derived type, then datatype is a dictionary itself
             for var_name in YAMLdict[cat_name].keys():
                 if "datatype" not in YAMLdict[cat_name][var_name].keys():
-                    logger.error("Variable %s does not contain a key for datatype")
+                    logger.error("Variable %s does not contain a key for datatype" % var_name)
                     invalid_file = True
+                    continue
 
                 if not isinstance(YAMLdict[cat_name][var_name]["datatype"], dict):
                     # 5. If datatype is not a dictionary, variable dictionary keys should include
