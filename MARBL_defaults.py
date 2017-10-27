@@ -10,11 +10,13 @@ class MARBL_defaults_class(object):
     # CONSTRUCTOR #
     ###############
 
-    def __init__(self, yaml_file, grid, input_file):
+    def __init__(self, yaml_file, grid, input_file, logger):
         """ Class constructor: set up a dictionary of config keywords for when multiple
             default values are provided, and then read the YAML file.
         """
         from collections import OrderedDict
+
+        self._log = logger
 
         # 1. Set up dictionary of config keywords
         self._config_keyword = OrderedDict()
@@ -28,28 +30,35 @@ class MARBL_defaults_class(object):
         try:
             import yaml
         except:
-            _abort("ERROR: Can not find PyYAML library")
-        with open(yaml_file) as parmsfile:
-            self._parms = yaml.safe_load(parmsfile)
+            self._log.error("Can not find PyYAML library")
+            _abort(1)
+        try:
+            with open(yaml_file) as parmsfile:
+                self._parms = yaml.safe_load(parmsfile)
+        except:
+            self._log.error("Can not find %s" % yaml_file)
+            _abort(1)
 
-        # 3.5 CONSISTENCY CHECK
-        if _invalid_parms_file(self._parms):
-            _abort("ERROR: %s is not a valid MARBL parameter file" % yaml_file)
+        # 4 Make sure YAML file adheres to MARBL parameter file schema
+        if _invalid_parms_file(self._parms, self._log):
+            self._log.error("%s is not a valid MARBL parameter file" % yaml_file)
+            _abort(1)
 
-        # 4. Read input file
-        self._input_dict = _parse_input_file(input_file)
+        # 5. Read input file
+        self._input_dict = _parse_input_file(input_file, self._log)
 
-        # 5. Use an ordered dictionary for keeping variable, value pairs
+        # 6. Use an ordered dictionary for keeping variable, value pairs
         self.parm_dict = OrderedDict()
         for cat_name in self.get_category_names():
             for var_name in self.get_variable_names(cat_name):
                 self._process_variable_value(cat_name, var_name)
 
         if (self._input_dict):
-            print "ERROR: Did not fully parse input file:"
+            message = "Did not fully parse input file:"
             for varname in self._input_dict.keys():
-                print "Could not handle variable %s" % varname
-            _abort()
+                message = message + "\n     * Variable %s not found in YAML" % varname
+            self._log.error(message)
+            _abort(1)
 
     ################################################################################
     #                             PUBLIC CLASS METHODS                             #
@@ -242,7 +251,7 @@ def _abort(err_code=0):
 
 ################################################################################
 
-def _invalid_parms_file(YAMLdict):
+def _invalid_parms_file(YAMLdict, logger):
     """ Read a YAML file, make sure it conforms to MARBL parameter file standards
         1. _order is a top-level key
         2. Everything listed in _order is a top-level key
@@ -260,47 +269,47 @@ def _invalid_parms_file(YAMLdict):
 
     # 1. _order is a top-level key
     if "_order" not in YAMLdict.keys():
-        print "Can not find _order key"
+        logger.error("Can not find _order key")
         invalid_file = True
 
     # 2. Everything listed in _order is a top-level key
     for cat_name in YAMLdict["_order"]:
         if cat_name not in YAMLdict.keys():
-            print "Can not find %s category that is listed in _order" % cat_name
+            logger.error("Can not find %s category that is listed in _order" % cat_name)
             invalid_file = True
 
     for cat_name in YAMLdict.keys():
         if cat_name[0] != '_':
         # 3. All top-level keys that do not begin with '_' are listed in _order
             if cat_name not in YAMLdict["_order"]:
-                print "Category %s not included in _order" % cat_name
+                logger.error("Category %s not included in _order" % cat_name)
                 invalid_file = True
 
             # 4. All second-level dictionaries (variable names) contain datatype key
             for var_name in YAMLdict[cat_name].keys():
                 if "datatype" not in YAMLdict[cat_name][var_name].keys():
-                    print "Variable %s does not contain a key for datatype"
+                    logger.error("Variable %s does not contain a key for datatype")
                     invalid_file = True
 
                 if not isinstance(YAMLdict[cat_name][var_name]["datatype"], dict):
                     # 5. If datatype is not a dictionary, variable dictionary keys should include
                     #    longname, subcategory, units, datatype, default_value
                     #    Also, if default_value is a dictionary, that dictionary needs to contain "default" key
-                    if not _valid_variable_dict(YAMLdict[cat_name][var_name], var_name):
+                    if not _valid_variable_dict(YAMLdict[cat_name][var_name], var_name, logger):
                         invalid_file = True
                 else:
                     # 6. If datatype is a dictionary, all keys in the datatype are variables per (5)
                     for subvar_name in YAMLdict[cat_name][var_name]["datatype"].keys():
                         if subvar_name[0] != '_':
                             if not _valid_variable_dict(YAMLdict[cat_name][var_name]["datatype"][subvar_name],
-                                                        "%s%%%s"  % (var_name, subvar_name)):
+                                                        "%s%%%s"  % (var_name, subvar_name), logger):
                                 invalid_file = True
 
     return invalid_file
 
 ################################################################################
 
-def _valid_variable_dict(var_dict, var_name):
+def _valid_variable_dict(var_dict, var_name, logger):
     """ Return False if dictionary does not contain any of the following:
         * longname
         * subcategory
@@ -311,13 +320,15 @@ def _valid_variable_dict(var_dict, var_name):
 
     for key_check in ["longname", "subcategory", "units", "datatype", "default_value"]:
         if key_check not in var_dict.keys():
-            print "Variable %s is not well-defined in YAML" % var_name
-            print "(Expecting %s as a key)" % key_check
+            message = "Variable %s is not well-defined in YAML" % var_name
+            message = message + "\n     * Expecting %s as a key" % key_check
+            logger.error(message)
             return False
     if isinstance(var_dict["default_value"], dict):
         # Make sure "default" is a valid key if default_value is a dictionary
         if "default" not in var_dict["default_value"].keys():
-            print "default_value dictionary in variable %s must have 'default' key" % var_name
+            logger.error("default_value dictionary in variable %s must have 'default' key" % var_name)
+            logger.info("Keys in default_value are %s" % var_dict["default_value"].keys())
             return False
     return True
 
@@ -349,14 +360,11 @@ def _get_var_value(varname, var_dict, provided_keys, input_dict):
         # is default value a dictionary? If so, it depends on self._config_keyword
         # Otherwise we're interested in default value
         if isinstance(var_dict["default_value"], dict):
-            # default must be a key in the default_value dictionary!
-            if "default" not in var_dict["default_value"].keys():
-                msg = "ERROR: " + var_dict["longname"] + " does not have a default key in default_value"
-                _abort(msg)
-
-            # return "default" entry in default_values dictionary unless one of the provided keys matches
+            # NOTE: _invalid_parms_file() has ensured that this dictionary has a "default" key
             use_key = "default"
             for key in provided_keys:
+                # return "default" entry in default_values dictionary unless one of the keys
+                # in provided_keys matches
                 if key in var_dict["default_value"].keys():
                     use_key = key
             def_value = var_dict["default_value"][use_key]
@@ -509,7 +517,7 @@ def _string_to_substring(str_in, separator):
 
 ################################################################################
 
-def _parse_input_file(input_file):
+def _parse_input_file(input_file, logger):
     """ 1. Read an input file; ignore blank lines and non-quoted Fortran comments.
         2. Turn lines of the form
               variable = value
@@ -544,7 +552,8 @@ def _parse_input_file(input_file):
         # If inputfile == None then the open will result in TypeError
         pass
     except:
-        _abort("ERROR: input_file '%s' was not found" % input_file)
+        logger.error("input_file '%s' was not found" % input_file)
+        _abort(1)
     return input_dict
 
 ################################################################################

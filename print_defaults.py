@@ -25,6 +25,14 @@ parser.add_argument('-l', '--lib_dir', action='store', dest='lib_dir', default='
                     help='Directory that contains MARBL_defaults.py')
 args = parser.parse_args()
 
+##################
+# Set up logging #
+##################
+
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 ###################################
 # Initialize class from YAML file #
 ###################################
@@ -32,7 +40,7 @@ args = parser.parse_args()
 from sys import path
 path.insert(0, args.lib_dir)
 from MARBL_defaults import MARBL_defaults_class
-DefaultParms = MARBL_defaults_class(args.yaml_file, args.grid, args.input_file)
+DefaultParms = MARBL_defaults_class(args.yaml_file, args.grid, args.input_file, logger)
 
 ################
 # BEGIN SCRIPT #
