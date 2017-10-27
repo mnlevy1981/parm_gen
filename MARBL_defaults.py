@@ -480,6 +480,8 @@ def _get_array_info(array_size_in, parm_dict, dict_prefix=''):
         If array_size_in is not an integer, check to see if it is in parm_dict
     """
 
+    logger = logging.getLogger(__name__)
+
     # List to be returned:
     str_index = []
 
@@ -489,8 +491,8 @@ def _get_array_info(array_size_in, parm_dict, dict_prefix=''):
         # This script only support 2D arrays for now
         # (and assumes array_size_in is not a list for 1D arrays)
         if len(array_size_in) > 2:
-            print "ERROR: _get_array_info() only supports 1D and 2D arrays"
-            _abort()
+            logger.error("_get_array_info() only supports 1D and 2D arrays")
+            _abort(1)
 
         for i in range(0, _get_dim_size(array_size_in[0], parm_dict, dict_prefix)):
             for j in range(0, _get_dim_size(array_size_in[1], parm_dict, dict_prefix)):

@@ -47,8 +47,8 @@ DefaultParms = MARBL_defaults_class(args.yaml_file, args.grid, args.input_file)#
 
 # Sort variables by subcategory
 for subcat_name in DefaultParms.get_subcategory_names():
-    print "! %s" % subcat_name.split('. ')[1]
+    print("! %s" % subcat_name.split('. ')[1])
     for varname in DefaultParms.get_parm_dict_variable_names(subcat_name):
-        print "%s =" % varname, DefaultParms.parm_dict[varname]
+        print("%s = %s" % (varname, DefaultParms.parm_dict[varname]))
     if subcat_name != DefaultParms.get_subcategory_names()[-1]:
-        print ""
+        print("")
