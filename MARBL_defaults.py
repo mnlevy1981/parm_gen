@@ -16,19 +16,14 @@ class MARBL_defaults_class(object):
         """ Class constructor: set up a dictionary of config keywords for when multiple
             default values are provided, and then read the YAML file.
         """
-        from collections import OrderedDict
 
         logger = logging.getLogger(__name__)
 
-        # 1. Set up dictionary of config keywords
-        self._config_keyword = OrderedDict()
-        self._config_keyword['grid'] = grid
+        # 1. List of configuration keywords to match in YAML if default_default is a dictionary
+        self._config_keyword = []
+        self._config_keyword.append("grid = " + grid)
 
-        # 2. Or maybe we want a list?
-        self._provided_keys = []
-        self._provided_keys.append("grid = " + self._config_keyword['grid'])
-
-        # 3. Read YAML file
+        # 2. Read YAML file
         try:
             import yaml
         except:
@@ -41,20 +36,23 @@ class MARBL_defaults_class(object):
             logger.error("Can not find %s" % yaml_file)
             _abort(1)
 
-        # 4 Make sure YAML file adheres to MARBL parameter file schema
+        # 3 Make sure YAML file adheres to MARBL parameter file schema
         if _invalid_parms_file(self._parms):
             logger.error("%s is not a valid MARBL parameter file" % yaml_file)
             _abort(1)
 
-        # 5. Read input file
+        # 4. Read input file
         self._input_dict = _parse_input_file(input_file)
 
-        # 6. Use an ordered dictionary for keeping variable, value pairs
+        # 5. Use an ordered dictionary for keeping variable, value pairs
+        from collections import OrderedDict
         self.parm_dict = OrderedDict()
         for cat_name in self.get_category_names():
             for var_name in self.get_variable_names(cat_name):
                 self._process_variable_value(cat_name, var_name)
 
+        # 6. Abort if not all values from input file were processed
+        #    (That implies at least one variable from input file was not recognized)
         if (self._input_dict):
             message = "Did not fully parse input file:"
             for varname in self._input_dict.keys():
@@ -180,7 +178,7 @@ class MARBL_defaults_class(object):
             return
 
         # Process derived type!
-        append_to_keys = (('PFT_defaults = "CESM2"' in self._provided_keys) and
+        append_to_keys = (('PFT_defaults = "CESM2"' in self._config_keyword) and
                           (category_name == "PFT_derived_types"))
         if append_to_keys:
             PFT_keys = self._parms['general_parms']['PFT_defaults']['_CESM2_PFT_keys'][variable_name]
@@ -192,7 +190,7 @@ class MARBL_defaults_class(object):
 
                 if append_to_keys:
                     # Add key for specific PFT
-                    self._provided_keys.append('%s = "%s"' % (variable_name, PFT_keys[n]))
+                    self._config_keyword.append('%s = "%s"' % (variable_name, PFT_keys[n]))
 
                 for key in _sort_with_specific_suffix_first(this_var["datatype"].keys(),'_cnt'):
                     if key[0] != '_':
@@ -206,7 +204,7 @@ class MARBL_defaults_class(object):
 
                 if append_to_keys:
                     # Remove PFT-specific key
-                    del self._provided_keys[-1]
+                    del self._config_keyword[-1]
 
     ################################################################################
 
@@ -229,7 +227,7 @@ class MARBL_defaults_class(object):
             # For each element, get value from either input file or YAML
             for n, elem_index in enumerate(_get_array_info(array_len, self.parm_dict, base_name)):
                 full_name = var_name + elem_index
-                var_value = _get_var_value(full_name, this_var, self._provided_keys, self._input_dict)
+                var_value = _get_var_value(full_name, this_var, self._config_keyword, self._input_dict)
                 if isinstance(var_value, list):
                     self.parm_dict[full_name] = var_value[n]
                 else:
@@ -238,7 +236,7 @@ class MARBL_defaults_class(object):
 
         else:
             # get value from either input file or YAML
-            self.parm_dict[var_name] = _get_var_value(var_name, this_var, self._provided_keys, self._input_dict)
+            self.parm_dict[var_name] = _get_var_value(var_name, this_var, self._config_keyword, self._input_dict)
             this_var['_list_of_parm_names'].append(var_name)
 
 ################################################################################
